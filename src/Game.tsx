@@ -1,9 +1,30 @@
+import { useReducer } from "react";
 import { GROUND_LEVEL, PLAYER_HEIGHT } from "./constants";
 import Ground from "./Ground";
 import Player from "./Player";
 import Water from "./Water";
 
-const INITIAL_STATE = [
+type BaseEntity = {
+  id: string;
+  type: string;
+};
+
+type Point = {
+  x: number;
+  y: number;
+};
+
+type PlayerEntity = BaseEntity & {
+  id: string;
+  type: "player";
+  position: Point;
+};
+
+type Entity = PlayerEntity;
+
+type Action = {};
+
+const INITIAL_STATE: Entity[] = [
   {
     id: "player",
     type: "player",
@@ -11,12 +32,17 @@ const INITIAL_STATE = [
   },
 ];
 
+const reducer = (state: Entity[], action: Action): Entity[] => {
+  return state;
+};
+
 const Game = () => {
+  const [state] = useReducer(reducer, INITIAL_STATE);
   return (
     <>
       <Water />
       <Ground />
-      {INITIAL_STATE.map((entity) => {
+      {state.map((entity) => {
         switch (entity.type) {
           case "player": {
             return <Player position={entity.position} />;
