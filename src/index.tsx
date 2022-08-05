@@ -1,6 +1,8 @@
 import ReactDOM from "react-dom/client";
 import { createGlobalStyle } from "styled-components";
 import App from "./App";
+import createKeyboard from "./keyboard/keyboard";
+import KeyboardProvider from "./keyboard/KeyboardProvider";
 import reportWebVitals from "./reportWebVitals";
 
 const GlobalStyle = createGlobalStyle`
@@ -15,10 +17,15 @@ if (rootEl === null) {
   throw new Error("Root element not found");
 }
 const root = ReactDOM.createRoot(rootEl);
+
+const keyboard = createKeyboard(window);
+
 root.render(
   <>
     <GlobalStyle />
-    <App />
+    <KeyboardProvider keyboard={keyboard}>
+      <App />
+    </KeyboardProvider>
   </>
 );
 
