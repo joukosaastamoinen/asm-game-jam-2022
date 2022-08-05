@@ -1,5 +1,7 @@
 import { useTick } from "@saitonakamura/react-pixi";
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
+import useSound from "use-sound";
+import gunSound from "./pew1.mp3";
 import Ground from "./Ground";
 import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
@@ -16,6 +18,8 @@ const JUMP_KEYS = ["Space", "KeyW"];
 
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+
+  const [playGunSound] = useSound(gunSound);
 
   useTick(() => {
     dispatch({ type: "TICK" });
@@ -38,6 +42,16 @@ const Game = () => {
         playerId: PLAYER_ID,
       });
     }
+  });
+
+  useEffect(() => {
+    const handleClick = () => {
+      playGunSound();
+    };
+    window.addEventListener("click", handleClick);
+    return () => {
+      window.removeEventListener("click", handleClick);
+    };
   });
 
   return (
