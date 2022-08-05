@@ -1,6 +1,8 @@
 import {
+  GRAVITY,
   GROUND_LEVEL,
   PLAYER_HEIGHT,
+  PLAYER_JUMP_SPEED,
   PLAYER_MOVEMENT_SPEED,
 } from "./constants";
 
@@ -14,6 +16,7 @@ type PlayerEntity = {
   type: "player";
   position: Point;
   moveIntent: number;
+  velocityY: number;
 };
 
 type Entity = PlayerEntity;
@@ -29,7 +32,12 @@ type MoveAction = {
   moveIntent: number;
 };
 
-type Action = TickAction | MoveAction;
+type JumpAction = {
+  type: "JUMP";
+  playerId: string;
+};
+
+type Action = TickAction | MoveAction | JumpAction;
 
 export const INITIAL_STATE: Entity[] = [
   {
@@ -37,6 +45,7 @@ export const INITIAL_STATE: Entity[] = [
     type: "player",
     position: { x: 0, y: GROUND_LEVEL + PLAYER_HEIGHT / 2 },
     moveIntent: 0,
+    velocityY: 0,
   },
 ];
 
@@ -59,11 +68,15 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
             return {
               ...entity,
               position: {
-                ...entity.position,
                 x:
                   entity.position.x +
                   action.timeDelta * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
+                y: Math.max(
+                  entity.position.y + action.timeDelta * entity.velocityY,
+                  PLAYER_HEIGHT / 2 + GROUND_LEVEL
+                ),
               },
+              velocityY: entity.velocityY - action.timeDelta * GRAVITY,
             };
           }
           default: {
@@ -75,6 +88,13 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
     case "MOVE": {
       return applyToEntityById(
         (entity) => ({ ...entity, moveIntent: action.moveIntent }),
+        action.playerId,
+        state
+      );
+    }
+    case "JUMP": {
+      return applyToEntityById(
+        (entity) => ({ ...entity, velocityY: PLAYER_JUMP_SPEED }),
         action.playerId,
         state
       );

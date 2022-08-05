@@ -12,6 +12,8 @@ const LEFT_KEYS = ["ArrowLeft", "KeyA"];
 
 const RIGHT_KEYS = ["ArrowRight", "KeyD"];
 
+const JUMP_KEYS = ["Space", "KeyW"];
+
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   useTick((delta) => {
@@ -25,6 +27,14 @@ const Game = () => {
         (RIGHT_KEYS.some((key) => keysDown.includes(key)) ? 1 : 0) -
         (LEFT_KEYS.some((key) => keysDown.includes(key)) ? 1 : 0),
     });
+  });
+  useKeys(JUMP_KEYS, (event) => {
+    if (event.type === "keydown") {
+      dispatch({
+        type: "JUMP",
+        playerId: PLAYER_ID,
+      });
+    }
   });
   return (
     <>
