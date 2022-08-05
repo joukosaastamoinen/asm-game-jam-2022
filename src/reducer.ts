@@ -1,17 +1,16 @@
+import cuid from "cuid";
 import {
+  BULLET_SPEED,
   GRAVITY,
   GROUND_LEVEL,
   GROUND_WIDTH,
   PLAYER_HEIGHT,
+  PLAYER_ID,
   PLAYER_JUMP_SPEED,
   PLAYER_MOVEMENT_SPEED,
   PLAYER_WIDTH,
 } from "./constants";
-
-type Point = {
-  x: number;
-  y: number;
-};
+import { Point, vectorAdd, vectorMul } from "./math";
 
 type PlayerEntity = {
   id: string;
@@ -21,7 +20,14 @@ type PlayerEntity = {
   velocityY: number;
 };
 
-type Entity = PlayerEntity;
+type BulletEntity = {
+  id: string;
+  type: "bullet";
+  position: Point;
+  velocity: Point;
+};
+
+type Entity = PlayerEntity | BulletEntity;
 
 type TickAction = {
   type: "TICK";
@@ -38,13 +44,19 @@ type JumpAction = {
   playerId: string;
 };
 
-type Action = TickAction | MoveAction | JumpAction;
+type ShootAction = {
+  type: "SHOOT";
+  playerId: string;
+  direction: Point;
+};
+
+type Action = TickAction | MoveAction | JumpAction | ShootAction;
 
 const TIME_DELTA = 1 / 60;
 
 export const INITIAL_STATE: Entity[] = [
   {
-    id: "player",
+    id: PLAYER_ID,
     type: "player",
     position: { x: 0, y: GROUND_LEVEL + PLAYER_HEIGHT / 2 },
     moveIntent: 0,
@@ -96,6 +108,15 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
               ),
             };
           }
+          case "bullet": {
+            return {
+              ...entity,
+              position: vectorAdd(
+                entity.position,
+                vectorMul(TIME_DELTA * BULLET_SPEED, entity.velocity)
+              ),
+            };
+          }
           default: {
             return entity;
           }
@@ -115,6 +136,21 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
         action.playerId,
         state
       );
+    }
+    case "SHOOT": {
+      const player = state.find((entity) => entity.id === action.playerId);
+      if (!player) {
+        throw new Error(`Player with ID ${action.playerId} not found!`);
+      }
+      return [
+        ...state,
+        {
+          id: cuid(),
+          type: "bullet",
+          position: player.position,
+          velocity: vectorMul(BULLET_SPEED, action.direction),
+        },
+      ];
     }
   }
 };

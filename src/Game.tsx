@@ -7,8 +7,9 @@ import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
 import reducer, { INITIAL_STATE } from "./reducer";
 import Water from "./Water";
-
-const PLAYER_ID = "player";
+import { PLAYER_ID } from "./constants";
+import { vectorAbs } from "./math";
+import Bullet from "./Bullet";
 
 const LEFT_KEYS = ["ArrowLeft", "KeyA"];
 
@@ -45,8 +46,24 @@ const Game = () => {
   });
 
   useEffect(() => {
-    const handleClick = () => {
+    const handleClick = (event: MouseEvent) => {
       playGunSound();
+      const clickCoordinates = {
+        x: event.clientX - window.innerWidth / 2,
+        y: -(event.clientY - window.innerHeight / 2 - 200),
+      };
+      const player = state.find((entity) => entity.id === PLAYER_ID);
+      if (!player) {
+        throw new Error("No player!");
+      }
+      dispatch({
+        type: "SHOOT",
+        playerId: PLAYER_ID,
+        direction: vectorAbs({
+          x: clickCoordinates.x - player.position.x,
+          y: clickCoordinates.y - player.position.y,
+        }),
+      });
     };
     window.addEventListener("click", handleClick);
     return () => {
@@ -58,13 +75,14 @@ const Game = () => {
     <>
       <Water />
       <Ground />
+      {/* eslint-disable-next-line array-callback-return */}
       {state.map((entity) => {
         switch (entity.type) {
           case "player": {
             return <Player key={entity.id} position={entity.position} />;
           }
-          default: {
-            throw new Error(`Unknown entity type ${entity.type}`);
+          case "bullet": {
+            return <Bullet key={entity.id} position={entity.position} />;
           }
         }
       })}

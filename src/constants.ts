@@ -6,3 +6,5 @@ export const PLAYER_HEIGHT = 40;
 export const PLAYER_MOVEMENT_SPEED = 7 * 60;
 export const PLAYER_JUMP_SPEED = 15 * 60;
 export const GRAVITY = 0.6 * 4000;
+export const BULLET_SPEED = 40;
+export const PLAYER_ID = "player";
