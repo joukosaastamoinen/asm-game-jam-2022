@@ -25,7 +25,6 @@ type Entity = PlayerEntity;
 
 type TickAction = {
   type: "TICK";
-  timeDelta: number;
 };
 
 type MoveAction = {
@@ -40,6 +39,8 @@ type JumpAction = {
 };
 
 type Action = TickAction | MoveAction | JumpAction;
+
+const TIME_DELTA = 1 / 60;
 
 export const INITIAL_STATE: Entity[] = [
   {
@@ -79,16 +80,16 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
               position: {
                 x:
                   entity.position.x +
-                  action.timeDelta * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
+                  TIME_DELTA * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
                 y: Math.max(
-                  entity.position.y + action.timeDelta * entity.velocityY,
+                  entity.position.y + TIME_DELTA * entity.velocityY,
                   playerIsOnGround
                     ? PLAYER_HEIGHT / 2 + GROUND_LEVEL
                     : -Infinity
                 ),
               },
               velocityY: Math.max(
-                entity.velocityY - action.timeDelta * GRAVITY,
+                entity.velocityY - TIME_DELTA * GRAVITY,
                 playerIsOnGround ? 0 : -Infinity
               ),
             };

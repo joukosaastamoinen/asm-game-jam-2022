@@ -17,8 +17,8 @@ const JUMP_KEYS = ["Space", "KeyW"];
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
-  useTick((delta) => {
-    dispatch({ type: "TICK", timeDelta: delta });
+  useTick(() => {
+    dispatch({ type: "TICK" });
   });
 
   useKeys([...LEFT_KEYS, ...RIGHT_KEYS], (_, keysDown) => {
