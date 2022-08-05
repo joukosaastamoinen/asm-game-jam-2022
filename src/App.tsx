@@ -24,7 +24,7 @@ function App() {
       }}
     >
       <Stage
-        options={{ backgroundColor: 0x10bb99 }}
+        options={{ backgroundColor: 0xff9977 }}
         width={width}
         height={height}
       >
