@@ -1,8 +1,6 @@
 import styled from "styled-components";
-import { Texture } from "pixi.js";
-import { Sprite, Stage } from "@saitonakamura/react-pixi";
+import { Stage } from "@saitonakamura/react-pixi";
 import useSound from "use-sound";
-import bunny from "./bunny.png";
 import pop from "./pop.mp3";
 import useWindowSize from "./useWindowSize";
 
@@ -27,9 +25,7 @@ function App() {
         options={{ backgroundColor: 0xff9977 }}
         width={width}
         height={height}
-      >
-        <Sprite texture={Texture.from(bunny)} x={200} y={200} />
-      </Stage>
+      ></Stage>
     </Root>
   );
 }
