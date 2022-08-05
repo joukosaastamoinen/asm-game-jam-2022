@@ -71,26 +71,28 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
             const playerRightEdge = entity.position.x + PLAYER_WIDTH / 2;
             const playerLeftEdge = entity.position.x - PLAYER_WIDTH / 2;
             const playerBottomEdge = entity.position.y - PLAYER_HEIGHT / 2;
-            const playerIsOnGround =
+            const distanceToGround =
               playerRightEdge >= -GROUND_WIDTH / 2 &&
               playerLeftEdge < GROUND_WIDTH / 2 &&
-              playerBottomEdge <= GROUND_LEVEL;
+              playerBottomEdge >= GROUND_LEVEL
+                ? playerBottomEdge - GROUND_LEVEL
+                : Infinity;
             return {
               ...entity,
               position: {
                 x:
                   entity.position.x +
                   TIME_DELTA * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
-                y: Math.max(
-                  entity.position.y + TIME_DELTA * entity.velocityY,
-                  playerIsOnGround
-                    ? PLAYER_HEIGHT / 2 + GROUND_LEVEL
-                    : -Infinity
-                ),
+                y:
+                  entity.position.y +
+                  Math.max(
+                    TIME_DELTA * entity.velocityY,
+                    -Math.max(0, distanceToGround)
+                  ),
               },
               velocityY: Math.max(
                 entity.velocityY - TIME_DELTA * GRAVITY,
-                playerIsOnGround ? 0 : -Infinity
+                distanceToGround <= 0 ? 0 : -Infinity
               ),
             };
           }
