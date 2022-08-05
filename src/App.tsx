@@ -30,7 +30,7 @@ function App() {
         width={width}
         height={height}
       >
-        <C position={[width / 2, height / 2]}>
+        <C position={[width / 2, height / 2 + 200]}>
           <Game />
         </C>
       </Stage>
