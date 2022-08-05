@@ -1,9 +1,11 @@
 import {
   GRAVITY,
   GROUND_LEVEL,
+  GROUND_WIDTH,
   PLAYER_HEIGHT,
   PLAYER_JUMP_SPEED,
   PLAYER_MOVEMENT_SPEED,
+  PLAYER_WIDTH,
 } from "./constants";
 
 type Point = {
@@ -65,6 +67,13 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
       return state.map((entity) => {
         switch (entity.type) {
           case "player": {
+            const playerRightEdge = entity.position.x + PLAYER_WIDTH / 2;
+            const playerLeftEdge = entity.position.x - PLAYER_WIDTH / 2;
+            const playerBottomEdge = entity.position.y - PLAYER_HEIGHT / 2;
+            const playerIsOnGround =
+              playerRightEdge >= -GROUND_WIDTH / 2 &&
+              playerLeftEdge < GROUND_WIDTH / 2 &&
+              playerBottomEdge <= GROUND_LEVEL;
             return {
               ...entity,
               position: {
@@ -73,10 +82,15 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
                   action.timeDelta * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
                 y: Math.max(
                   entity.position.y + action.timeDelta * entity.velocityY,
-                  PLAYER_HEIGHT / 2 + GROUND_LEVEL
+                  playerIsOnGround
+                    ? PLAYER_HEIGHT / 2 + GROUND_LEVEL
+                    : -Infinity
                 ),
               },
-              velocityY: entity.velocityY - action.timeDelta * GRAVITY,
+              velocityY: Math.max(
+                entity.velocityY - action.timeDelta * GRAVITY,
+                playerIsOnGround ? 0 : -Infinity
+              ),
             };
           }
           default: {
