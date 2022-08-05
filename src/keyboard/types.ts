@@ -2,6 +2,7 @@ export type EventType = "keyup" | "keydown";
 
 export type Event = {
   key: string;
+  type: "keyup" | "keydown";
   preventDefault: () => void;
 };
 

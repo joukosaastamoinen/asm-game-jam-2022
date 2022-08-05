@@ -17,7 +17,7 @@ const Game = () => {
   useTick((delta) => {
     dispatch({ type: "TICK", timeDelta: delta });
   });
-  useKeys([...LEFT_KEYS, ...RIGHT_KEYS], (_key, _eventName, keysDown) => {
+  useKeys([...LEFT_KEYS, ...RIGHT_KEYS], (_, keysDown) => {
     dispatch({
       type: "MOVE",
       playerId: PLAYER_ID,

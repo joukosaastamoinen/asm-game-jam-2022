@@ -18,6 +18,7 @@ const createKeyboard = (window: Window): Keyboard => {
     if (!keysDown.includes(event.code)) {
       keysDown = keysDown.concat(event.code);
       fireEvent("keydown", {
+        type: "keydown",
         key: event.code,
         preventDefault: () => {
           defaultPrevented.add(event.code);
@@ -33,6 +34,7 @@ const createKeyboard = (window: Window): Keyboard => {
     keysDown = keysDown.filter((key) => key !== event.code);
     defaultPrevented.delete(event.code);
     fireEvent("keyup", {
+      type: "keyup",
       key: event.code,
       preventDefault: event.preventDefault.bind(event),
     });

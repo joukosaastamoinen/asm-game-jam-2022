@@ -1,10 +1,10 @@
 import { useContext, useEffect } from "react";
 import KeyboardContext from "./KeyboardContext";
-import { Event, EventType } from "./types";
+import { Event } from "./types";
 
 const useKeys = (
   keys: string[],
-  onEvent = (key: string, eventName: EventType, keysDown: string[]) => {}
+  onEvent = (event: Event, keysDown: string[]) => {}
 ) => {
   const keyboard = useContext(KeyboardContext);
   useEffect(() => {
@@ -16,8 +16,7 @@ const useKeys = (
       if (keys.includes(event.key)) {
         event.preventDefault();
         onEvent(
-          event.key,
-          "keyup",
+          event,
           keyboard.getKeysDown().filter((key) => keys.includes(key))
         );
       }
@@ -26,8 +25,7 @@ const useKeys = (
       if (keys.includes(event.key)) {
         event.preventDefault();
         onEvent(
-          event.key,
-          "keydown",
+          event,
           keyboard.getKeysDown().filter((key) => keys.includes(key))
         );
       }
