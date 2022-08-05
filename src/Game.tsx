@@ -4,6 +4,7 @@ import { useEffect, useReducer } from "react";
 import useSound from "use-sound";
 import music from "./music1.mp3";
 import gunSound from "./pew1.mp3";
+import jumpSound from "./jump1.mp3";
 import Ground from "./Ground";
 import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
@@ -37,6 +38,8 @@ const Game = () => {
 
   const [playGunSound] = useSound(gunSound);
 
+  const [playJumpSound] = useSound(jumpSound);
+
   useTick(() => {
     dispatch({ type: "TICK" });
   });
@@ -53,6 +56,7 @@ const Game = () => {
 
   useKeys(JUMP_KEYS, (event) => {
     if (event.type === "keydown") {
+      playJumpSound();
       dispatch({
         type: "JUMP",
         playerId: PLAYER_ID,
