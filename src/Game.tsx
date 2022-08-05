@@ -53,7 +53,7 @@ const Game = () => {
         x: event.clientX - window.innerWidth / 2,
         y: -(event.clientY - window.innerHeight / 2 - 200),
       };
-      const player = state.find((entity) => entity.id === PLAYER_ID);
+      const player = state.entities.find((entity) => entity.id === PLAYER_ID);
       if (!player) {
         throw new Error("No player!");
       }
@@ -86,7 +86,7 @@ const Game = () => {
       <Water />
       <Ground />
       {/* eslint-disable-next-line array-callback-return */}
-      {state.map((entity) => {
+      {state.entities.map((entity) => {
         switch (entity.type) {
           case "player": {
             return <Player key={entity.id} position={entity.position} />;
