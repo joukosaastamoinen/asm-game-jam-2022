@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Container, Stage } from "@saitonakamura/react-pixi";
 import useSound from "use-sound";
-import pop from "./pop.mp3";
+import gunSound from "./pew1.mp3";
 import useWindowSize from "./useWindowSize";
 import Game from "./Game";
 import KeyboardProvider from "./keyboard/KeyboardProvider";
@@ -19,7 +19,7 @@ const Root = styled.div`
 const C = Container as any;
 
 function App() {
-  const [playPop] = useSound(pop);
+  const [playPop] = useSound(gunSound);
   const [width, height] = useWindowSize();
   const keyboard = useKeyboard();
   return (
