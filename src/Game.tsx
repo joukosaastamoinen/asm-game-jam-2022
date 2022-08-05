@@ -7,9 +7,10 @@ import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
 import reducer, { INITIAL_STATE } from "./reducer";
 import Water from "./Water";
-import { PLAYER_ID } from "./constants";
+import { ENEMY_SPAWN_INTERVAL, PLAYER_ID } from "./constants";
 import { vectorAbs } from "./math";
 import Bullet from "./Bullet";
+import Enemy from "./Enemy";
 
 const LEFT_KEYS = ["ArrowLeft", "KeyA"];
 
@@ -71,6 +72,15 @@ const Game = () => {
     };
   });
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      dispatch({ type: "SPAWN_ENEMY" });
+    }, 1000 * ENEMY_SPAWN_INTERVAL);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <>
       <Water />
@@ -83,6 +93,9 @@ const Game = () => {
           }
           case "bullet": {
             return <Bullet key={entity.id} position={entity.position} />;
+          }
+          case "enemy": {
+            return <Enemy key={entity.id} position={entity.position} />;
           }
         }
       })}

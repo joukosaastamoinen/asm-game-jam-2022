@@ -1,6 +1,7 @@
 import cuid from "cuid";
 import {
   BULLET_SPEED,
+  ENEMY_SPEED,
   GRAVITY,
   GROUND_LEVEL,
   GROUND_WIDTH,
@@ -27,7 +28,13 @@ type Bullet = {
   velocity: Point;
 };
 
-type Entity = Player | Bullet;
+type Enemy = {
+  id: string;
+  type: "enemy";
+  position: Point;
+};
+
+type Entity = Player | Bullet | Enemy;
 
 type TickAction = {
   type: "TICK";
@@ -50,7 +57,16 @@ type ShootAction = {
   direction: Point;
 };
 
-type Action = TickAction | MoveAction | JumpAction | ShootAction;
+type SpawnEnemyAction = {
+  type: "SPAWN_ENEMY";
+};
+
+type Action =
+  | TickAction
+  | MoveAction
+  | JumpAction
+  | ShootAction
+  | SpawnEnemyAction;
 
 const TIME_DELTA = 1 / 60;
 
@@ -117,6 +133,15 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
               ),
             };
           }
+          case "enemy": {
+            return {
+              ...entity,
+              position: vectorAdd(entity.position, {
+                x: 0,
+                y: -TIME_DELTA * ENEMY_SPEED,
+              }),
+            };
+          }
           default: {
             return entity;
           }
@@ -149,6 +174,19 @@ const reducer = (state: Entity[], action: Action): Entity[] => {
           type: "bullet",
           position: player.position,
           velocity: vectorMul(BULLET_SPEED, action.direction),
+        },
+      ];
+    }
+    case "SPAWN_ENEMY": {
+      return [
+        ...state,
+        {
+          id: cuid(),
+          type: "enemy",
+          position: {
+            x: Math.random() * 1000 - 500,
+            y: 700,
+          },
         },
       ];
     }
