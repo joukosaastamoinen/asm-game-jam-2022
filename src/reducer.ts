@@ -12,7 +12,7 @@ import {
 } from "./constants";
 import { Point, vectorAdd, vectorMul } from "./math";
 
-type PlayerEntity = {
+type Player = {
   id: string;
   type: "player";
   position: Point;
@@ -20,14 +20,14 @@ type PlayerEntity = {
   velocityY: number;
 };
 
-type BulletEntity = {
+type Bullet = {
   id: string;
   type: "bullet";
   position: Point;
   velocity: Point;
 };
 
-type Entity = PlayerEntity | BulletEntity;
+type Entity = Player | Bullet;
 
 type TickAction = {
   type: "TICK";
