@@ -16,9 +16,11 @@ const JUMP_KEYS = ["Space", "KeyW"];
 
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+
   useTick((delta) => {
     dispatch({ type: "TICK", timeDelta: delta });
   });
+
   useKeys([...LEFT_KEYS, ...RIGHT_KEYS], (_, keysDown) => {
     dispatch({
       type: "MOVE",
@@ -28,6 +30,7 @@ const Game = () => {
         (LEFT_KEYS.some((key) => keysDown.includes(key)) ? 1 : 0),
     });
   });
+
   useKeys(JUMP_KEYS, (event) => {
     if (event.type === "keydown") {
       dispatch({
@@ -36,6 +39,7 @@ const Game = () => {
       });
     }
   });
+
   return (
     <>
       <Water />
