@@ -4,34 +4,62 @@ import useWindowSize from "./useWindowSize";
 import Game from "./Game";
 import KeyboardProvider from "./keyboard/KeyboardProvider";
 import useKeyboard from "./keyboard/useKeyboard";
+import { useState } from "react";
 
 const Root = styled.div`
-  width: 100%;
-  height: 100;
+  background-color: #000;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   canvas {
     display: block;
   }
+`;
+
+const StartButton = styled.button`
+  font-family: monospace;
+  margin: 0;
+  padding: 20px 40px;
+  appearance: none;
+  background: #0f0;
+  border: none;
+  color: #000;
+  font-size: 100px;
+  cursor: pointer;
 `;
 
 // Hack around incorrect types in react-pixi
 const C = Container as any;
 
 function App() {
+  const [started, setStarted] = useState(false);
   const [width, height] = useWindowSize();
   const keyboard = useKeyboard();
   return (
     <Root>
-      <Stage
-        options={{ backgroundColor: 0xffcc99 }}
-        width={width}
-        height={height}
-      >
-        <KeyboardProvider keyboard={keyboard}>
-          <C position={[width / 2, height / 2 + 200]}>
-            <Game />
-          </C>
-        </KeyboardProvider>
-      </Stage>
+      {started ? (
+        <Stage
+          options={{ backgroundColor: 0xffcc99 }}
+          width={width}
+          height={height}
+        >
+          <KeyboardProvider keyboard={keyboard}>
+            <C position={[width / 2, height / 2 + 200]}>
+              <Game />
+            </C>
+          </KeyboardProvider>
+        </Stage>
+      ) : (
+        <StartButton
+          onClick={() => {
+            setStarted(true);
+          }}
+        >
+          Start
+        </StartButton>
+      )}
     </Root>
   );
 }

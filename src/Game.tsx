@@ -1,6 +1,8 @@
+import { Howl } from "howler";
 import { useTick } from "@saitonakamura/react-pixi";
 import { useEffect, useReducer } from "react";
 import useSound from "use-sound";
+import music from "./music1.mp3";
 import gunSound from "./pew1.mp3";
 import Ground from "./Ground";
 import useKeys from "./keyboard/useKeys";
@@ -20,6 +22,18 @@ const JUMP_KEYS = ["Space", "KeyW"];
 
 const Game = () => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+
+  useEffect(() => {
+    const sound = new Howl({
+      src: [music],
+      loop: true,
+      autoplay: true,
+    });
+    return () => {
+      sound.stop();
+      sound.unload();
+    };
+  }, []);
 
   const [playGunSound] = useSound(gunSound);
 
