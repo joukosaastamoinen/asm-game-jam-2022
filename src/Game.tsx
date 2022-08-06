@@ -109,7 +109,7 @@ const Game = () => {
           case "player": {
             return <Player key={entity.id} position={entity.position} />;
           }
-          case "bullet": {
+          case "projectile": {
             return <Bullet key={entity.id} position={entity.position} />;
           }
           case "enemy": {

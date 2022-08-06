@@ -21,9 +21,9 @@ type Player = {
   velocityY: number;
 };
 
-type Bullet = {
+type Projectile = {
   id: string;
-  type: "bullet";
+  type: "projectile";
   position: Point;
   velocity: Point;
 };
@@ -34,7 +34,7 @@ type Enemy = {
   position: Point;
 };
 
-type Entity = Player | Bullet | Enemy;
+type Entity = Player | Projectile | Enemy;
 
 type State = {
   entities: Entity[];
@@ -132,7 +132,7 @@ const reducer = (state: State, action: Action): State => {
                 ),
               };
             }
-            case "bullet": {
+            case "projectile": {
               return {
                 ...entity,
                 position: vectorAdd(
@@ -190,7 +190,7 @@ const reducer = (state: State, action: Action): State => {
           ...state.entities,
           {
             id: cuid(),
-            type: "bullet",
+            type: "projectile",
             position: player.position,
             velocity: vectorMul(BULLET_SPEED, action.direction),
           },
