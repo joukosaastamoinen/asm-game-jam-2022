@@ -10,7 +10,11 @@ import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
 import reducer, { INITIAL_STATE } from "./reducer";
 import Water from "./Water";
-import { ENEMY_SPAWN_INTERVAL, PLAYER_ID } from "./constants";
+import {
+  ENEMY_INITIAL_HEALTH,
+  ENEMY_SPAWN_INTERVAL,
+  PLAYER_ID,
+} from "./constants";
 import { identityVector } from "./math";
 import Projectile from "./Projectile";
 import Enemy from "./Enemy";
@@ -114,7 +118,13 @@ const Game = () => {
             return <Projectile key={entity.id} position={entity.position} />;
           }
           case "enemy": {
-            return <Enemy key={entity.id} position={entity.position} />;
+            return (
+              <Enemy
+                key={entity.id}
+                position={entity.position}
+                damaged={entity.health < 0.7 * ENEMY_INITIAL_HEALTH}
+              />
+            );
           }
         }
       })}
