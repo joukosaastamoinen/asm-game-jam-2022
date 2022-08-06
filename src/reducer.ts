@@ -309,36 +309,53 @@ const applyDamage = (state: State): State => {
       return acc;
     }
     if (target.type === "enemy" && projectileOwner.type === "player") {
-      const newEnemy = {
-        ...target,
-        health: target.health - PLAYER_PROJECTILE_DAMAGE,
-      };
       return {
         ...state,
         entities: removeEntityById(
           projectile.id,
-          newEnemy.health <= 0
-            ? removeEntityById(newEnemy.id, state.entities)
-            : applyToEntityById(() => newEnemy, newEnemy.id, state.entities)
+          applyToEntityById(
+            () => ({
+              ...target,
+              health: target.health - PLAYER_PROJECTILE_DAMAGE,
+            }),
+            target.id,
+            state.entities
+          )
         ),
       };
     } else if (target.type === "player" && projectileOwner.type === "enemy") {
-      const newPlayer = {
-        ...target,
-        health: target.health - ENEMY_PROJECTILE_DAMAGE,
-      };
       return {
         ...state,
         entities: removeEntityById(
           projectile.id,
-          newPlayer.health <= 0
-            ? removeEntityById(newPlayer.id, state.entities)
-            : applyToEntityById(() => newPlayer, newPlayer.id, state.entities)
+          applyToEntityById(
+            () => ({
+              ...target,
+              health: target.health - ENEMY_PROJECTILE_DAMAGE,
+            }),
+            target.id,
+            state.entities
+          )
         ),
       };
     }
     return acc;
   }, state);
+};
+
+const commenceDeath = (state: State): State => {
+  return {
+    ...state,
+    entities: state.entities.filter((entity) => {
+      if (
+        (entity.type === "player" || entity.type === "enemy") &&
+        entity.health <= 0
+      ) {
+        return false;
+      }
+      return true;
+    }),
+  };
 };
 
 const processEnemyShooting = (state: State): State => {
@@ -401,7 +418,9 @@ const cleanUp = (state: State): State => {
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "TICK": {
-      return processEnemyShooting(applyDamage(tickPhysics(cleanUp(state))));
+      return processEnemyShooting(
+        applyDamage(tickPhysics(cleanUp(commenceDeath(state))))
+      );
     }
     case "MOVE": {
       return {
