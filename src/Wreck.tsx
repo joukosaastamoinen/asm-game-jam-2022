@@ -39,7 +39,7 @@ const Wreck = ({ position }: Props) => {
         image={wreck}
         x={0}
         y={0}
-        pivot={{ x: 75, y: 75 }}
+        pivot={{ x: 60, y: 60 }}
         scale={{ x: 0.5, y: 0.5 }}
       />
       <C scale={{ x: explosionScale, y: explosionScale }}>
