@@ -552,6 +552,8 @@ const commenceDeath = (state: State): State => {
   };
 };
 
+const isPlayer = (entity: Entity): entity is Player => entity.type === "player";
+
 const processEnemyShooting = (state: State): State => {
   return {
     ...state,
@@ -559,7 +561,7 @@ const processEnemyShooting = (state: State): State => {
       if (entity.type !== "enemy") {
         return newEntities;
       }
-      const player = newEntities.find((e) => e.type === "player");
+      const player: Player | undefined = newEntities.find(isPlayer);
       if (
         entity.position.y < 500 &&
         entity.timeSinceLastFired > ENEMY_FIRING_INTERVAL &&
