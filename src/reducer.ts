@@ -1,6 +1,6 @@
 import cuid from "cuid";
 import {
-  BULLET_SPEED,
+  PLAYER_PROJECTILE_SPEED,
   ENEMY_INITIAL_HEALTH,
   ENEMY_SPEED,
   GRAVITY,
@@ -14,8 +14,17 @@ import {
   PLAYER_WIDTH,
   ENEMY_RADIUS,
   PLAYER_PROJECTILE_DAMAGE,
+  ENEMY_FIRING_INTERVAL,
+  ENEMY_PROJECTILE_SPEED,
 } from "./constants";
-import { distance, Point, vectorAdd, vectorMul } from "./math";
+import {
+  distance,
+  identityVector,
+  Point,
+  vectorAdd,
+  vectorMul,
+  vectorSub,
+} from "./math";
 
 type Player = {
   id: string;
@@ -39,6 +48,7 @@ type Enemy = {
   type: "enemy";
   position: Point;
   health: number;
+  timeSinceLastFired: number;
 };
 
 type Entity = Player | Projectile | Enemy;
@@ -143,7 +153,7 @@ const tickPhysics = (state: State): State => {
             ...entity,
             position: vectorAdd(
               entity.position,
-              vectorMul(TIME_DELTA * BULLET_SPEED, entity.velocity)
+              vectorMul(TIME_DELTA * PLAYER_PROJECTILE_SPEED, entity.velocity)
             ),
           };
         }
@@ -258,10 +268,52 @@ const applyDamage = (state: State): State => {
   }, state);
 };
 
+const processEnemyShooting = (state: State): State => {
+  return {
+    ...state,
+    entities: state.entities.reduce((newEntities, entity) => {
+      if (entity.type !== "enemy") {
+        return newEntities;
+      }
+      const player = newEntities.find((e) => e.type === "player");
+      if (entity.timeSinceLastFired > ENEMY_FIRING_INTERVAL && player) {
+        return applyToEntityById(
+          () => ({
+            ...entity,
+            timeSinceLastFired: 0,
+          }),
+          entity.id,
+          [
+            ...newEntities,
+            {
+              id: cuid(),
+              type: "projectile",
+              position: entity.position,
+              velocity: vectorMul(
+                ENEMY_PROJECTILE_SPEED,
+                identityVector(vectorSub(player.position, entity.position))
+              ),
+              ownerId: entity.id,
+            },
+          ]
+        );
+      }
+      return applyToEntityById(
+        () => ({
+          ...entity,
+          timeSinceLastFired: (entity.timeSinceLastFired += TIME_DELTA),
+        }),
+        entity.id,
+        newEntities
+      );
+    }, state.entities),
+  };
+};
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "TICK": {
-      return applyDamage(tickPhysics(state));
+      return processEnemyShooting(applyDamage(tickPhysics(state)));
     }
     case "MOVE": {
       return {
@@ -298,7 +350,7 @@ const reducer = (state: State, action: Action): State => {
             id: cuid(),
             type: "projectile",
             position: player.position,
-            velocity: vectorMul(BULLET_SPEED, action.direction),
+            velocity: vectorMul(PLAYER_PROJECTILE_SPEED, action.direction),
             ownerId: player.id,
           },
         ],
@@ -317,6 +369,7 @@ const reducer = (state: State, action: Action): State => {
               y: 600,
             },
             health: ENEMY_INITIAL_HEALTH,
+            timeSinceLastFired: ENEMY_FIRING_INTERVAL,
           },
         ],
       };
