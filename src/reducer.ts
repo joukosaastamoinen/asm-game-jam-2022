@@ -432,7 +432,7 @@ const assignWrecksToSlots = (state: State): State => {
           (WRECK_AREA_TOP - WRECK_AREA_BOTTOM)) *
           WRECK_AREA_VERTICAL_DIVISIONS
       );
-      if (column < 0 || column > WRECK_AREA_HORIZONTAL_DIVISIONS) {
+      if (column < 0 || column >= WRECK_AREA_HORIZONTAL_DIVISIONS) {
         return newSlots;
       }
       const row = newSlots[column].findIndex((el) => el === null);
