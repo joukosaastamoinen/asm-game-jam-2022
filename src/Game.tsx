@@ -132,12 +132,8 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
       <C position={[canvasWidth / 2, canvasHeight / 2 + 200]}>
         <Water />
         <Ground />
-        {/* eslint-disable-next-line array-callback-return */}
         {state.entities.map((entity) => {
           switch (entity.type) {
-            case "player": {
-              return <Player key={entity.id} position={entity.position} />;
-            }
             case "projectile": {
               return <Projectile key={entity.id} position={entity.position} />;
             }
@@ -153,8 +149,12 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
             case "wreck": {
               return <Wreck key={entity.id} position={entity.position} />;
             }
+            default: {
+              return null;
+            }
           }
         })}
+        {player && <Player key={player.id} position={player.position} />}
       </C>
     </>
   );
