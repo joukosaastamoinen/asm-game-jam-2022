@@ -131,7 +131,6 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
       />
       <C position={[canvasWidth / 2, canvasHeight / 2 + 200]}>
         <Water />
-        <Ground />
         {state.entities.map((entity) => {
           switch (entity.type) {
             case "projectile": {
@@ -154,6 +153,7 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
             }
           }
         })}
+        <Ground />
         {player && <Player key={player.id} position={player.position} />}
       </C>
     </>
