@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Container, Stage } from "@saitonakamura/react-pixi";
+import { Stage } from "@saitonakamura/react-pixi";
 import useWindowSize from "./useWindowSize";
 import Game from "./Game";
 import KeyboardProvider from "./keyboard/KeyboardProvider";
@@ -30,9 +30,6 @@ const StartButton = styled.button`
   cursor: pointer;
 `;
 
-// Hack around incorrect types in react-pixi
-const C = Container as any;
-
 function App() {
   const [started, setStarted] = useState(false);
   const [width, height] = useWindowSize();
@@ -46,9 +43,7 @@ function App() {
           height={height}
         >
           <KeyboardProvider keyboard={keyboard}>
-            <C position={[width / 2, height / 2 + 200]}>
-              <Game />
-            </C>
+            <Game canvasWidth={width} canvasHeight={height} />
           </KeyboardProvider>
         </Stage>
       ) : (

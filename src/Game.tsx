@@ -1,5 +1,5 @@
 import { Howl } from "howler";
-import { useTick } from "@saitonakamura/react-pixi";
+import { Container, useTick } from "@saitonakamura/react-pixi";
 import { useEffect, useReducer } from "react";
 import useSound from "use-sound";
 import music from "./music1.mp3";
@@ -19,13 +19,21 @@ import { identityVector } from "./math";
 import Projectile from "./Projectile";
 import Enemy from "./Enemy";
 
+type Props = {
+  canvasWidth: number;
+  canvasHeight: number;
+};
+
 const LEFT_KEYS = ["ArrowLeft", "KeyA"];
 
 const RIGHT_KEYS = ["ArrowRight", "KeyD"];
 
 const JUMP_KEYS = ["Space", "KeyW"];
 
-const Game = () => {
+// Hack around incorrect types in react-pixi
+const C = Container as any;
+
+const Game = ({ canvasWidth, canvasHeight }: Props) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
 
   useEffect(() => {
@@ -105,7 +113,7 @@ const Game = () => {
   }, []);
 
   return (
-    <>
+    <C position={[canvasWidth / 2, canvasHeight / 2 + 200]}>
       <Water />
       <Ground />
       {/* eslint-disable-next-line array-callback-return */}
@@ -128,7 +136,7 @@ const Game = () => {
           }
         }
       })}
-    </>
+    </C>
   );
 };
 
