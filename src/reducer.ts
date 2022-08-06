@@ -54,7 +54,15 @@ type Enemy = {
   timeSinceLastFired: number;
 };
 
-type Entity = Player | Projectile | Enemy;
+type Wreck = {
+  id: string;
+  type: "wreck";
+  position: Point;
+  velocityY: number;
+  lifetime: number; // in seconds
+};
+
+type Entity = Player | Projectile | Enemy | Wreck;
 
 type State = {
   entities: Entity[];
@@ -342,15 +350,26 @@ const applyDamage = (state: State): State => {
 const commenceDeath = (state: State): State => {
   return {
     ...state,
-    entities: state.entities.filter((entity) => {
-      if (
-        (entity.type === "player" || entity.type === "enemy") &&
-        entity.health <= 0
-      ) {
-        return false;
-      }
-      return true;
-    }),
+    entities: state.entities
+      .map((entity) => {
+        if (entity.type === "enemy" && entity.health <= 0) {
+          const wreck: Wreck = {
+            id: entity.id,
+            type: "wreck",
+            position: entity.position,
+            lifetime: 0,
+            velocityY: 0,
+          };
+          return wreck;
+        }
+        return entity;
+      })
+      .filter((entity) => {
+        if (entity.type === "player" && entity.health <= 0) {
+          return false;
+        }
+        return true;
+      }),
   };
 };
 

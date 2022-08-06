@@ -23,6 +23,7 @@ import { identityVector } from "./math";
 import Projectile from "./Projectile";
 import Enemy from "./Enemy";
 import HealthMeter from "./HealthMeter";
+import Wreck from "./Wreck";
 
 type Props = {
   canvasWidth: number;
@@ -148,6 +149,9 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
                   damaged={entity.health < 0.7 * ENEMY_INITIAL_HEALTH}
                 />
               );
+            }
+            case "wreck": {
+              return <Wreck key={entity.id} position={entity.position} />;
             }
           }
         })}
