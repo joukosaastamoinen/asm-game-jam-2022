@@ -1,9 +1,6 @@
 import styled from "styled-components";
-import { Stage } from "@saitonakamura/react-pixi";
 import useWindowSize from "./useWindowSize";
 import Game from "./Game";
-import KeyboardProvider from "./keyboard/KeyboardProvider";
-import useKeyboard from "./keyboard/useKeyboard";
 import { useState } from "react";
 
 const Root = styled.div`
@@ -33,19 +30,10 @@ const StartButton = styled.button`
 function App() {
   const [started, setStarted] = useState(false);
   const [width, height] = useWindowSize();
-  const keyboard = useKeyboard();
   return (
     <Root>
       {started ? (
-        <Stage
-          options={{ backgroundColor: 0xffcc99 }}
-          width={width}
-          height={height}
-        >
-          <KeyboardProvider keyboard={keyboard}>
-            <Game canvasWidth={width} canvasHeight={height} />
-          </KeyboardProvider>
-        </Stage>
+        <Game canvasWidth={width} canvasHeight={height} />
       ) : (
         <StartButton
           onClick={() => {
