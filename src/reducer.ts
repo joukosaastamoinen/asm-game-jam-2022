@@ -22,6 +22,7 @@ import {
   identityVector,
   Point,
   vectorAdd,
+  vectorLength,
   vectorMul,
   vectorSub,
 } from "./math";
@@ -310,10 +311,25 @@ const processEnemyShooting = (state: State): State => {
   };
 };
 
+const cleanUp = (state: State): State => {
+  return {
+    ...state,
+    entities: state.entities.filter((entity) => {
+      if (
+        entity.type === "projectile" &&
+        vectorLength(entity.position) > 1500
+      ) {
+        return false;
+      }
+      return true;
+    }),
+  };
+};
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "TICK": {
-      return processEnemyShooting(applyDamage(tickPhysics(state)));
+      return processEnemyShooting(applyDamage(tickPhysics(cleanUp(state))));
     }
     case "MOVE": {
       return {
