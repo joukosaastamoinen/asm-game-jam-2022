@@ -10,7 +10,7 @@ type Props = {
 const WIDTH = 2 * PROJECTILE_RADIUS;
 const HEIGHT = 2 * PROJECTILE_RADIUS;
 
-const Bullet = ({ position }: Props) => {
+const Projectile = ({ position }: Props) => {
   const draw = useCallback(
     (g: PIXI.Graphics) => {
       g.clear();
@@ -28,4 +28,4 @@ const Bullet = ({ position }: Props) => {
   return <Graphics draw={draw} />;
 };
 
-export default Bullet;
+export default Projectile;

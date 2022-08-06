@@ -12,7 +12,7 @@ import reducer, { INITIAL_STATE } from "./reducer";
 import Water from "./Water";
 import { ENEMY_SPAWN_INTERVAL, PLAYER_ID } from "./constants";
 import { identityVector } from "./math";
-import Bullet from "./Bullet";
+import Projectile from "./Projectile";
 import Enemy from "./Enemy";
 
 const LEFT_KEYS = ["ArrowLeft", "KeyA"];
@@ -111,7 +111,7 @@ const Game = () => {
             return <Player key={entity.id} position={entity.position} />;
           }
           case "projectile": {
-            return <Bullet key={entity.id} position={entity.position} />;
+            return <Projectile key={entity.id} position={entity.position} />;
           }
           case "enemy": {
             return <Enemy key={entity.id} position={entity.position} />;
