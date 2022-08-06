@@ -53,7 +53,7 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
     };
   }, []);
 
-  const [playGunSound] = useSound(gunSound, { volume: 0.5 });
+  const [playGunSound] = useSound(gunSound, { volume: 0.3 });
 
   const [playJumpSound] = useSound(jumpSound, { volume: 0.5 });
 
