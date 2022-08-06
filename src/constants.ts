@@ -17,4 +17,5 @@ export const PROJECTILE_RADIUS = 5;
 export const PLAYER_PROJECTILE_DAMAGE = 20;
 export const ENEMY_PROJECTILE_DAMAGE = 10;
 export const ENEMY_FIRING_INTERVAL = 2.2; // make enemies shoot every n seconds
+export const WRECK_FALL_DELAY = 0.2;
 export const PLAYER_ID = "player";

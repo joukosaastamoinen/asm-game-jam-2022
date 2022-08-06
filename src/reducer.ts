@@ -18,6 +18,7 @@ import {
   ENEMY_PROJECTILE_SPEED,
   PROJECTILE_RADIUS,
   ENEMY_PROJECTILE_DAMAGE,
+  WRECK_FALL_DELAY,
 } from "./constants";
 import {
   distance,
@@ -183,6 +184,23 @@ const tickPhysics = (state: State): State => {
               x: 0,
               y: -TIME_DELTA * ENEMY_SPEED,
             }),
+          };
+        }
+        case "wreck": {
+          if (entity.lifetime < WRECK_FALL_DELAY) {
+            return {
+              ...entity,
+              lifetime: entity.lifetime + TIME_DELTA,
+            };
+          }
+          return {
+            ...entity,
+            velocityY: entity.velocityY - TIME_DELTA * GRAVITY,
+            position: {
+              ...entity.position,
+              y: entity.position.y + TIME_DELTA * entity.velocityY,
+            },
+            lifetime: entity.lifetime + TIME_DELTA,
           };
         }
         default: {
@@ -420,7 +438,7 @@ const cleanUp = (state: State): State => {
     ...state,
     entities: state.entities.filter((entity) => {
       if (
-        entity.type === "projectile" &&
+        (entity.type === "projectile" || entity.type === "wreck") &&
         vectorLength(entity.position) > 1500
       ) {
         return false;
