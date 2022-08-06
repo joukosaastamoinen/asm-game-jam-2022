@@ -16,6 +16,8 @@ import {
   PLAYER_PROJECTILE_DAMAGE,
   ENEMY_FIRING_INTERVAL,
   ENEMY_PROJECTILE_SPEED,
+  PROJECTILE_RADIUS,
+  ENEMY_PROJECTILE_DAMAGE,
 } from "./constants";
 import {
   distance,
@@ -192,11 +194,51 @@ type ProjectileCollision = {
   targetId: string;
 };
 
+// From: http://jeffreythompson.org/collision-detection/circle-rect.php
+const isCircleAndRectangleIntersecting = (
+  cx: number,
+  cy: number,
+  radius: number,
+  top: number,
+  right: number,
+  bottom: number,
+  left: number
+) => {
+  // temporary variables to set edges for testing
+  let testX = cx;
+  let testY = cy;
+
+  // which edge is closest?
+  if (cx < left) testX = left; // test left edge
+  else if (cx > right) testX = right; // right edge
+  if (cy < bottom) testY = bottom; // bottom edge
+  else if (cy > top) testY = top; // top edge
+
+  // get distance from closest edges
+  const distX = cx - testX;
+  const distY = cy - testY;
+  const distance = Math.sqrt(distX * distX + distY * distY);
+
+  // if the distance is less than the radius, collision!
+  if (distance <= radius) {
+    return true;
+  }
+  return false;
+};
+
 const isProjectileCollidingWithPlayer = (
   projectile: Projectile,
   player: Player
 ): boolean => {
-  return false;
+  return isCircleAndRectangleIntersecting(
+    projectile.position.x,
+    projectile.position.y,
+    PROJECTILE_RADIUS,
+    player.position.y + PLAYER_HEIGHT / 2,
+    player.position.x + PLAYER_WIDTH / 2,
+    player.position.y - PLAYER_HEIGHT / 2,
+    player.position.x - PLAYER_WIDTH / 2
+  );
 };
 
 const isProjectileCollidingWithEnemy = (
@@ -254,14 +296,18 @@ const removeEntityById = (
 const applyDamage = (state: State): State => {
   const projectileHits = findProjectileHits(state);
   return projectileHits.reduce((acc, hit) => {
-    const target = entityById(hit.targetId, state.entities) as Player | Enemy;
-    const projectile = entityById(
-      hit.projectileId,
-      state.entities
-    ) as Projectile;
-    const projectileOwner = entityById(projectile.ownerId, state.entities) as
-      | Player
-      | Enemy;
+    const target = entityById(hit.targetId, state.entities);
+    if (!target) {
+      return acc;
+    }
+    const projectile = entityById(hit.projectileId, state.entities);
+    if (!projectile || projectile.type !== "projectile") {
+      return acc;
+    }
+    const projectileOwner = entityById(projectile.ownerId, state.entities);
+    if (!projectileOwner) {
+      return acc;
+    }
     if (target.type === "enemy" && projectileOwner.type === "player") {
       const newEnemy = {
         ...target,
@@ -273,7 +319,21 @@ const applyDamage = (state: State): State => {
           projectile.id,
           newEnemy.health <= 0
             ? removeEntityById(newEnemy.id, state.entities)
-            : applyToEntityById((enemy) => newEnemy, target.id, state.entities)
+            : applyToEntityById(() => newEnemy, newEnemy.id, state.entities)
+        ),
+      };
+    } else if (target.type === "player" && projectileOwner.type === "enemy") {
+      const newPlayer = {
+        ...target,
+        health: target.health - ENEMY_PROJECTILE_DAMAGE,
+      };
+      return {
+        ...state,
+        entities: removeEntityById(
+          projectile.id,
+          newPlayer.health <= 0
+            ? removeEntityById(newPlayer.id, state.entities)
+            : applyToEntityById(() => newPlayer, newPlayer.id, state.entities)
         ),
       };
     }

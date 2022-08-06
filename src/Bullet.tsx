@@ -1,13 +1,14 @@
 import { Graphics } from "@saitonakamura/react-pixi";
 import * as PIXI from "pixi.js";
 import { useCallback } from "react";
+import { PROJECTILE_RADIUS } from "./constants";
 
 type Props = {
   position: { x: number; y: number };
 };
 
-const WIDTH = 10;
-const HEIGHT = 10;
+const WIDTH = 2 * PROJECTILE_RADIUS;
+const HEIGHT = 2 * PROJECTILE_RADIUS;
 
 const Bullet = ({ position }: Props) => {
   const draw = useCallback(

@@ -74,7 +74,7 @@ const Game = () => {
       };
       const player = state.entities.find((entity) => entity.id === PLAYER_ID);
       if (!player) {
-        throw new Error("No player!");
+        return;
       }
       dispatch({
         type: "SHOOT",
