@@ -510,7 +510,10 @@ const applyDamage = (state: State): State => {
           )
         ),
       };
-    } else if (target.type === "player" && projectileOwner.type === "enemy") {
+    } else if (
+      target.type === "player" &&
+      (!projectileOwner || projectileOwner.type !== "player")
+    ) {
       return {
         ...state,
         entities: removeEntityById(
