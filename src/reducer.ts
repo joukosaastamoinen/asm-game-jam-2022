@@ -19,12 +19,12 @@ import {
   PROJECTILE_RADIUS,
   ENEMY_PROJECTILE_DAMAGE,
   WRECK_FALL_DELAY,
-  WRECK_AREA_HORIZONTAL_DIVISIONS,
-  WRECK_AREA_VERTICAL_DIVISIONS,
-  WRECK_AREA_LEFT,
-  WRECK_AREA_RIGHT,
-  WRECK_AREA_TOP,
-  WRECK_AREA_BOTTOM,
+  GRID_COLUMNS,
+  GRID_ROWS,
+  GRID_LEFT,
+  GRID_RIGHT,
+  GRID_TOP,
+  GRID_BOTTOM,
   ENEMY_STAY_DURATION,
 } from "./constants";
 import {
@@ -129,9 +129,7 @@ export const INITIAL_STATE: State = {
       health: PLAYER_INITIAL_HEALTH,
     },
   ],
-  slots: [...Array(WRECK_AREA_HORIZONTAL_DIVISIONS)].map(() =>
-    Array(WRECK_AREA_VERTICAL_DIVISIONS).fill(null)
-  ),
+  slots: [...Array(GRID_COLUMNS)].map(() => Array(GRID_ROWS).fill(null)),
 };
 
 const applyToEntityById = (
@@ -145,19 +143,13 @@ const applyToEntityById = (
 };
 
 const calculateSlotPosition = (i: number, j: number) => {
-  const wreckAreaWidth = WRECK_AREA_RIGHT - WRECK_AREA_LEFT;
-  const wreckAreaHeight = WRECK_AREA_TOP - WRECK_AREA_BOTTOM;
-  const slotWidth = wreckAreaWidth / WRECK_AREA_HORIZONTAL_DIVISIONS;
-  const slotHeight = wreckAreaHeight / WRECK_AREA_VERTICAL_DIVISIONS;
+  const wreckAreaWidth = GRID_RIGHT - GRID_LEFT;
+  const wreckAreaHeight = GRID_TOP - GRID_BOTTOM;
+  const slotWidth = wreckAreaWidth / GRID_COLUMNS;
+  const slotHeight = wreckAreaHeight / GRID_ROWS;
   return {
-    x:
-      WRECK_AREA_LEFT +
-      (i / WRECK_AREA_HORIZONTAL_DIVISIONS) * wreckAreaWidth +
-      slotWidth / 2,
-    y:
-      WRECK_AREA_BOTTOM +
-      (j / WRECK_AREA_VERTICAL_DIVISIONS) * wreckAreaHeight +
-      slotHeight / 2,
+    x: GRID_LEFT + (i / GRID_COLUMNS) * wreckAreaWidth + slotWidth / 2,
+    y: GRID_BOTTOM + (j / GRID_ROWS) * wreckAreaHeight + slotHeight / 2,
   };
 };
 
@@ -187,28 +179,25 @@ const playerDistanceToNearestPlatform = (
       ? playerBottomEdge - GROUND_LEVEL
       : Infinity;
   const column = Math.floor(
-    ((player.position.x - WRECK_AREA_LEFT) /
-      (WRECK_AREA_RIGHT - WRECK_AREA_LEFT)) *
-      WRECK_AREA_HORIZONTAL_DIVISIONS
+    ((player.position.x - GRID_LEFT) / (GRID_RIGHT - GRID_LEFT)) * GRID_COLUMNS
   );
-  if (column < 0 || column >= WRECK_AREA_HORIZONTAL_DIVISIONS) {
+  if (column < 0 || column >= GRID_COLUMNS) {
     return distanceToGround;
   }
-  const wreckAreaHeight = WRECK_AREA_TOP - WRECK_AREA_BOTTOM;
+  const wreckAreaHeight = GRID_TOP - GRID_BOTTOM;
   const row = findLastIndex(
     (slot) => slot !== null,
     state.slots[column].slice(
       0,
       Math.floor(
-        ((playerBottomEdge - WRECK_AREA_BOTTOM) / wreckAreaHeight) *
-          WRECK_AREA_VERTICAL_DIVISIONS
+        ((playerBottomEdge - GRID_BOTTOM) / wreckAreaHeight) * GRID_ROWS
       )
     )
   );
   if (row === -1) {
     return distanceToGround;
   }
-  const slotHeight = wreckAreaHeight / WRECK_AREA_VERTICAL_DIVISIONS;
+  const slotHeight = wreckAreaHeight / GRID_ROWS;
   const slotPosition = calculateSlotPosition(column, row);
   const slotTopEdge = slotPosition.y + slotHeight / 2;
   return playerBottomEdge - slotTopEdge;
@@ -497,16 +486,14 @@ const assignWrecksToSlots = (state: State): State => {
     ...state,
     slots: wrecks.reduce((newSlots, wreck) => {
       const column = Math.floor(
-        ((wreck.position.x - WRECK_AREA_LEFT) /
-          (WRECK_AREA_RIGHT - WRECK_AREA_LEFT)) *
-          WRECK_AREA_HORIZONTAL_DIVISIONS
+        ((wreck.position.x - GRID_LEFT) / (GRID_RIGHT - GRID_LEFT)) *
+          GRID_COLUMNS
       );
       const highestPossibleRow = Math.floor(
-        ((wreck.position.y - WRECK_AREA_BOTTOM) /
-          (WRECK_AREA_TOP - WRECK_AREA_BOTTOM)) *
-          WRECK_AREA_VERTICAL_DIVISIONS
+        ((wreck.position.y - GRID_BOTTOM) / (GRID_TOP - GRID_BOTTOM)) *
+          GRID_ROWS
       );
-      if (column < 0 || column >= WRECK_AREA_HORIZONTAL_DIVISIONS) {
+      if (column < 0 || column >= GRID_COLUMNS) {
         return newSlots;
       }
       const row = newSlots[column].findIndex((el) => el === null);
