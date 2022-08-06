@@ -9,8 +9,8 @@ type Props = {
 };
 
 const variants = {
-  blue: projectileRed,
-  red: projectileBlue,
+  red: projectileRed,
+  blue: projectileBlue,
 };
 
 const Projectile = ({ position, rotation, variant }: Props) => {

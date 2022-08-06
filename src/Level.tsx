@@ -150,7 +150,7 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
                   key={entity.id}
                   position={entity.position}
                   rotation={Math.atan2(entity.velocity.x, entity.velocity.y)}
-                  variant="red"
+                  variant={entity.ownerId === PLAYER_ID ? "blue" : "red"}
                 />
               );
             }
