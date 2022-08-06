@@ -65,7 +65,7 @@ const Player = ({ position, moveIntent }: Props) => {
         isPlaying={moveIntent !== 0}
         initialFrame={0}
         animationSpeed={0.25}
-        scale={{ x: lastMoveIntent, y: 1 }}
+        scale={{ x: 0.5 * lastMoveIntent, y: 0.5 }}
       />
     </C>
   ) : null;

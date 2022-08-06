@@ -1,8 +1,13 @@
-import { Container, Graphics, useTick } from "@saitonakamura/react-pixi";
+import {
+  Container,
+  Graphics,
+  Sprite,
+  useTick,
+} from "@saitonakamura/react-pixi";
 import * as PIXI from "pixi.js";
 import { useCallback, useEffect, useState } from "react";
 import useSound from "use-sound";
-import { ENEMY_RADIUS } from "./constants";
+import wreck from "./wreck.png";
 import explosionSound from "./rajahdys.mp3";
 
 type Props = {
@@ -22,15 +27,6 @@ const Wreck = ({ position }: Props) => {
   useTick((delta) => {
     setExplosionScale((scale) => Math.max(0, scale - 0.2 * delta));
   });
-  const drawWreck = useCallback((g: PIXI.Graphics) => {
-    g.clear();
-    g.lineStyle(2, 0x4444444, 1, 0);
-    g.beginFill(0xbbbbbb, 1);
-    g.drawCircle(0, 0, 0.9 * ENEMY_RADIUS);
-    g.drawRect(-ENEMY_RADIUS, -ENEMY_RADIUS, 5, 2 * ENEMY_RADIUS);
-    g.drawRect(ENEMY_RADIUS - 5, -ENEMY_RADIUS, 5, 2 * ENEMY_RADIUS);
-    g.endFill();
-  }, []);
   const drawExplosion = useCallback((g: PIXI.Graphics) => {
     g.clear();
     g.beginFill(0xffffff, 1);
@@ -39,7 +35,13 @@ const Wreck = ({ position }: Props) => {
   }, []);
   return (
     <C x={position.x} y={-position.y} rotation={rotation}>
-      <Graphics draw={drawWreck} />
+      <Sprite
+        image={wreck}
+        x={0}
+        y={0}
+        pivot={{ x: 75, y: 75 }}
+        scale={{ x: 0.5, y: 0.5 }}
+      />
       <C scale={{ x: explosionScale, y: explosionScale }}>
         <Graphics draw={drawExplosion} />
       </C>
