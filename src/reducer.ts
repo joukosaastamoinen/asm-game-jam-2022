@@ -150,6 +150,15 @@ const playerDistanceToGround = (player: Player, entities: Entity[]): number => {
 };
 
 const tickPhysics = (state: State): State => {
+  const wreckIdToSlot = new Map<string, { i: number; j: number }>();
+  for (let i = 0; i < state.slots.length; i++) {
+    for (let j = 0; j < state.slots[i].length; j++) {
+      const value = state.slots[i][j];
+      if (value !== null) {
+        wreckIdToSlot.set(value, { i, j });
+      }
+    }
+  }
   return {
     ...state,
     entities: state.entities.map((entity) => {
@@ -203,13 +212,31 @@ const tickPhysics = (state: State): State => {
               lifetime: entity.lifetime + TIME_DELTA,
             };
           }
+          const slot = wreckIdToSlot.get(entity.id);
+          const direction = slot
+            ? identityVector(
+                vectorSub(
+                  {
+                    x:
+                      WRECK_AREA_LEFT +
+                      (slot.i / WRECK_AREA_HORIZONTAL_DIVISIONS) *
+                        (WRECK_AREA_RIGHT - WRECK_AREA_LEFT),
+                    y:
+                      WRECK_AREA_BOTTOM +
+                      (slot.j / WRECK_AREA_VERTICAL_DIVISIONS) *
+                        (WRECK_AREA_TOP - WRECK_AREA_BOTTOM),
+                  },
+                  entity.position
+                )
+              )
+            : { x: 0, y: -1 };
           return {
             ...entity,
-            velocityY: entity.velocityY - TIME_DELTA * GRAVITY,
-            position: {
-              ...entity.position,
-              y: entity.position.y + TIME_DELTA * entity.velocityY,
-            },
+            velocityY: entity.velocityY + TIME_DELTA * GRAVITY,
+            position: vectorAdd(
+              entity.position,
+              vectorMul(TIME_DELTA * entity.velocityY, direction)
+            ),
             lifetime: entity.lifetime + TIME_DELTA,
           };
         }
@@ -377,18 +404,6 @@ const applyDamage = (state: State): State => {
 
 const isWreck = (entity: Entity): entity is Wreck => entity.type === "wreck";
 
-const findLastIndex = <T>(
-  predicateFn: (el: T) => boolean,
-  arr: T[]
-): number => {
-  for (let i = arr.length - 1; i >= 0; i--) {
-    if (predicateFn(arr[i])) {
-      return i;
-    }
-  }
-  return -1;
-};
-
 const assignWrecksToSlots = (state: State): State => {
   const wrecks: Wreck[] = state.entities
     .filter(isWreck)
@@ -409,7 +424,7 @@ const assignWrecksToSlots = (state: State): State => {
       if (column < 0 || column > WRECK_AREA_HORIZONTAL_DIVISIONS) {
         return newSlots;
       }
-      const row = findLastIndex((el) => el === null, newSlots[column]);
+      const row = newSlots[column].findIndex((el) => el === null);
       if (row > -1 && row <= highestPossibleRow) {
         return [
           ...newSlots.slice(0, column),
