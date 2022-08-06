@@ -164,7 +164,13 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
               );
             }
             case "wreck": {
-              return <Wreck key={entity.id} position={entity.position} />;
+              return (
+                <Wreck
+                  key={entity.id}
+                  x={entity.position.x}
+                  y={entity.position.y}
+                />
+              );
             }
             default: {
               return null;

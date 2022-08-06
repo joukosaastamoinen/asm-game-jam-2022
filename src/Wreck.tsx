@@ -5,13 +5,14 @@ import {
   useTick,
 } from "@saitonakamura/react-pixi";
 import * as PIXI from "pixi.js";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useSound from "use-sound";
 import wreck from "./wreck.png";
 import explosionSound from "./rajahdys.mp3";
 
 type Props = {
-  position: { x: number; y: number };
+  x: number;
+  y: number;
 };
 
 // Hack around incorrect types in react-pixi
@@ -21,7 +22,9 @@ const PIVOT = { x: 60, y: 60 };
 
 const SCALE = { x: 0.5, y: 0.5 };
 
-const Wreck = ({ position }: Props) => {
+const TEXTURE = PIXI.Texture.from(wreck);
+
+const Wreck = ({ x, y }: Props) => {
   const [playExplosionSound] = useSound(explosionSound, { volume: 0.4 });
   useEffect(() => {
     playExplosionSound();
@@ -42,8 +45,8 @@ const Wreck = ({ position }: Props) => {
     [explosionScale]
   );
   return (
-    <C x={position.x} y={-position.y} rotation={rotation}>
-      <Sprite image={wreck} x={0} y={0} pivot={PIVOT} scale={SCALE} />
+    <C x={x} y={-y} rotation={rotation}>
+      <Sprite texture={TEXTURE} x={0} y={0} pivot={PIVOT} scale={SCALE} />
       <C scale={explosionScaleObject}>
         <Graphics draw={drawExplosion} />
       </C>
@@ -51,4 +54,4 @@ const Wreck = ({ position }: Props) => {
   );
 };
 
-export default Wreck;
+export default React.memo(Wreck);
