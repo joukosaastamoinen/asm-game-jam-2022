@@ -1,31 +1,29 @@
-import { Graphics } from "@saitonakamura/react-pixi";
-import * as PIXI from "pixi.js";
-import { useCallback } from "react";
-import { PROJECTILE_RADIUS } from "./constants";
+import { Sprite } from "@saitonakamura/react-pixi";
+import projectileRed from "./projectile-red.png";
+import projectileBlue from "./projectile-blue.png";
 
 type Props = {
   position: { x: number; y: number };
+  rotation: number;
+  variant: "blue" | "red";
 };
 
-const WIDTH = 2 * PROJECTILE_RADIUS;
-const HEIGHT = 2 * PROJECTILE_RADIUS;
+const variants = {
+  blue: projectileRed,
+  red: projectileBlue,
+};
 
-const Projectile = ({ position }: Props) => {
-  const draw = useCallback(
-    (g: PIXI.Graphics) => {
-      g.clear();
-      g.beginFill(0x000000, 1);
-      g.drawRect(
-        position.x - WIDTH / 2,
-        -position.y - HEIGHT / 2,
-        WIDTH,
-        HEIGHT
-      );
-      g.endFill();
-    },
-    [position.x, position.y]
+const Projectile = ({ position, rotation, variant }: Props) => {
+  return (
+    <Sprite
+      image={variants[variant]}
+      pivot={{ x: 8, y: 8 }}
+      x={position.x}
+      y={-position.y}
+      rotation={rotation}
+      scale={{ x: 1.5, y: 1.5 }}
+    />
   );
-  return <Graphics draw={draw} />;
 };
 
 export default Projectile;

@@ -145,7 +145,14 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
         {state.entities.map((entity) => {
           switch (entity.type) {
             case "projectile": {
-              return <Projectile key={entity.id} position={entity.position} />;
+              return (
+                <Projectile
+                  key={entity.id}
+                  position={entity.position}
+                  rotation={Math.atan2(entity.velocity.x, entity.velocity.y)}
+                  variant="red"
+                />
+              );
             }
             case "enemy": {
               return (
