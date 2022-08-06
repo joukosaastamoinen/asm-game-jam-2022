@@ -22,6 +22,6 @@ export const WRECK_AREA_LEFT = -340;
 export const WRECK_AREA_RIGHT = 340;
 export const WRECK_AREA_TOP = 450;
 export const WRECK_AREA_BOTTOM = GROUND_LEVEL + ENEMY_RADIUS - 5;
-export const WRECK_AREA_HORIZONTAL_DIVISIONS = 25;
+export const WRECK_AREA_HORIZONTAL_DIVISIONS = 17;
 export const WRECK_AREA_VERTICAL_DIVISIONS = 12;
 export const PLAYER_ID = "player";
