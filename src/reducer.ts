@@ -25,6 +25,7 @@ import {
   WRECK_AREA_RIGHT,
   WRECK_AREA_TOP,
   WRECK_AREA_BOTTOM,
+  ENEMY_STAY_DURATION,
 } from "./constants";
 import {
   distance,
@@ -57,8 +58,10 @@ type Enemy = {
   id: string;
   type: "enemy";
   position: Point;
+  direction: Point;
   health: number;
   timeSinceLastFired: number;
+  lifetime: number;
 };
 
 type Wreck = {
@@ -216,6 +219,9 @@ const tickPhysics = (state: State): State => {
       }
     }
   }
+  const player = state.entities.find((entity) => entity.type === "player") as
+    | Player
+    | undefined;
   return {
     ...state,
     entities: state.entities.map((entity) => {
@@ -254,12 +260,25 @@ const tickPhysics = (state: State): State => {
           };
         }
         case "enemy": {
+          const target =
+            player && entity.lifetime < ENEMY_STAY_DURATION
+              ? { x: player.position.x, y: 300 }
+              : { x: 0, y: 2000 };
+          const targetDirection = identityVector(
+            vectorSub(target, entity.position)
+          );
+          const v = 0.01;
           return {
             ...entity,
-            position: vectorAdd(entity.position, {
-              x: 0,
-              y: -TIME_DELTA * ENEMY_SPEED,
-            }),
+            direction: {
+              x: v * targetDirection.x + (1 - v) * entity.direction.x,
+              y: v * targetDirection.y + (1 - v) * entity.direction.y,
+            },
+            position: vectorAdd(
+              entity.position,
+              vectorMul(TIME_DELTA * ENEMY_SPEED, entity.direction)
+            ),
+            lifetime: entity.lifetime + TIME_DELTA,
           };
         }
         case "wreck": {
@@ -534,7 +553,11 @@ const processEnemyShooting = (state: State): State => {
         return newEntities;
       }
       const player = newEntities.find((e) => e.type === "player");
-      if (entity.timeSinceLastFired > ENEMY_FIRING_INTERVAL && player) {
+      if (
+        entity.position.y < 500 &&
+        entity.timeSinceLastFired > ENEMY_FIRING_INTERVAL &&
+        player
+      ) {
         return applyToEntityById(
           () => ({
             ...entity,
@@ -643,10 +666,12 @@ const reducer = (state: State, action: Action): State => {
             type: "enemy",
             position: {
               x: Math.random() * 1000 - 500,
-              y: 600,
+              y: 900,
             },
             health: ENEMY_INITIAL_HEALTH,
             timeSinceLastFired: ENEMY_FIRING_INTERVAL,
+            lifetime: 0,
+            direction: { x: 0, y: -1 },
           },
         ],
       };
