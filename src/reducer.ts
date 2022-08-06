@@ -104,12 +104,17 @@ type SpawnEnemyAction = {
   type: "SPAWN_ENEMY";
 };
 
+type RestartAction = {
+  type: "RESTART";
+};
+
 export type Action =
   | TickAction
   | MoveAction
   | JumpAction
   | ShootAction
-  | SpawnEnemyAction;
+  | SpawnEnemyAction
+  | RestartAction;
 
 const TIME_DELTA = 1 / 60;
 
@@ -675,6 +680,9 @@ const reducer = (state: State, action: Action): State => {
           },
         ],
       };
+    }
+    case "RESTART": {
+      return INITIAL_STATE;
     }
   }
 };
