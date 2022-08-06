@@ -2,7 +2,7 @@ import { Howl } from "howler";
 import { Container, Sprite, useTick } from "@saitonakamura/react-pixi";
 import { useEffect } from "react";
 import useSound from "use-sound";
-import music from "./music1.mp3";
+import music from "./music2.mp3";
 import gunSound from "./pew1.mp3";
 import jumpSound from "./jump1.mp3";
 import sky from "./sky.png";
