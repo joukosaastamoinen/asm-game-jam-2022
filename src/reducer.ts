@@ -207,7 +207,7 @@ const reducer = (state: State, action: Action): State => {
             type: "enemy",
             position: {
               x: Math.random() * 1000 - 500,
-              y: 700,
+              y: 600,
             },
           },
         ],
