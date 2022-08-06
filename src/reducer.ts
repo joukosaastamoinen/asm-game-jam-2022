@@ -221,8 +221,13 @@ const distanceToNearestWall = (player: Player, state: State): number => {
   const slotWidth = gridWidth / GRID_COLUMNS;
   if (player.moveIntent > 0) {
     for (let i = column + 1; i < GRID_COLUMNS; i++) {
-      if (state.slots[i][row] !== null) {
+      const slot = state.slots[i][row];
+      if (slot !== null) {
+        const wreck = entityById(slot, state.entities) as Wreck | undefined;
         const slotPosition = calculateSlotPosition(i, row);
+        if (!wreck || distance(wreck.position, slotPosition) > 0.0001) {
+          continue;
+        }
         const slotLeftEdge = slotPosition.x - slotWidth / 2;
         const playerRightEdge = player.position.x + PLAYER_WIDTH / 2;
         return slotLeftEdge - playerRightEdge;
@@ -231,8 +236,13 @@ const distanceToNearestWall = (player: Player, state: State): number => {
   }
   if (player.moveIntent < 0) {
     for (let i = column - 1; i >= 0; i--) {
-      if (state.slots[i][row] !== null) {
+      const slot = state.slots[i][row];
+      if (slot !== null) {
+        const wreck = entityById(slot, state.entities) as Wreck | undefined;
         const slotPosition = calculateSlotPosition(i, row);
+        if (!wreck || distance(wreck.position, slotPosition) > 0.0001) {
+          continue;
+        }
         const slotRightEdge = slotPosition.x + slotWidth / 2;
         const playerLeftEdge = player.position.x - PLAYER_WIDTH / 2;
         return playerLeftEdge - slotRightEdge;
