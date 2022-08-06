@@ -571,15 +571,9 @@ const processEnemyShooting = (state: State): State => {
 const cleanUp = (state: State): State => {
   return {
     ...state,
-    entities: state.entities.filter((entity) => {
-      if (
-        (entity.type === "projectile" || entity.type === "wreck") &&
-        vectorLength(entity.position) > 1500
-      ) {
-        return false;
-      }
-      return true;
-    }),
+    entities: state.entities.filter(
+      (entity) => vectorLength(entity.position) < 1500
+    ),
   };
 };
 
