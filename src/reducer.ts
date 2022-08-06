@@ -136,7 +136,39 @@ const applyToEntityById = (
   );
 };
 
-const playerDistanceToGround = (player: Player, entities: Entity[]): number => {
+const calculateSlotPosition = (i: number, j: number) => {
+  const wreckAreaWidth = WRECK_AREA_RIGHT - WRECK_AREA_LEFT;
+  const wreckAreaHeight = WRECK_AREA_TOP - WRECK_AREA_BOTTOM;
+  const slotWidth = wreckAreaWidth / WRECK_AREA_HORIZONTAL_DIVISIONS;
+  const slotHeight = wreckAreaHeight / WRECK_AREA_VERTICAL_DIVISIONS;
+  return {
+    x:
+      WRECK_AREA_LEFT +
+      (i / WRECK_AREA_HORIZONTAL_DIVISIONS) * wreckAreaWidth +
+      slotWidth / 2,
+    y:
+      WRECK_AREA_BOTTOM +
+      (j / WRECK_AREA_VERTICAL_DIVISIONS) * wreckAreaHeight +
+      slotHeight / 2,
+  };
+};
+
+const findLastIndex = <T>(
+  predicateFn: (el: T) => boolean,
+  arr: T[]
+): number => {
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (predicateFn(arr[i])) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+const playerDistanceToNearestPlatform = (
+  player: Player,
+  state: State
+): number => {
   const playerRightEdge = player.position.x + PLAYER_WIDTH / 2;
   const playerLeftEdge = player.position.x - PLAYER_WIDTH / 2;
   const playerBottomEdge = player.position.y - PLAYER_HEIGHT / 2;
@@ -146,7 +178,31 @@ const playerDistanceToGround = (player: Player, entities: Entity[]): number => {
     playerBottomEdge >= GROUND_LEVEL
       ? playerBottomEdge - GROUND_LEVEL
       : Infinity;
+  const column = Math.floor(
+    ((player.position.x - WRECK_AREA_LEFT) /
+      (WRECK_AREA_RIGHT - WRECK_AREA_LEFT)) *
+      WRECK_AREA_HORIZONTAL_DIVISIONS
+  );
   return distanceToGround;
+  // if (column < 0 || column >= WRECK_AREA_HORIZONTAL_DIVISIONS) {
+  //   return distanceToGround;
+  // }
+  // const row = findLastIndex(
+  //   (slot) => slot !== null,
+  //   state.slots[column].slice(
+  //     0,
+  //     Math.floor(
+  //       ((playerBottomEdge - WRECK_AREA_BOTTOM) /
+  //         (WRECK_AREA_TOP - WRECK_AREA_BOTTOM)) *
+  //         WRECK_AREA_VERTICAL_DIVISIONS
+  //     )
+  //   )
+  // );
+  // if (row === -1) {
+  //   return distanceToGround;
+  // }
+  // return calculateSlotPosition(column, row);
+  // return distanceToGround;
 };
 
 const tickPhysics = (state: State): State => {
@@ -164,9 +220,9 @@ const tickPhysics = (state: State): State => {
     entities: state.entities.map((entity) => {
       switch (entity.type) {
         case "player": {
-          const distanceToGround = playerDistanceToGround(
+          const distanceToGround = playerDistanceToNearestPlatform(
             entity,
-            state.entities
+            state
           );
           return {
             ...entity,
@@ -223,16 +279,7 @@ const tickPhysics = (state: State): State => {
                   vectorMul(TIME_DELTA * entity.velocityY, { x: 0, y: -1 })
                 );
               }
-              const slotPosition = {
-                x:
-                  WRECK_AREA_LEFT +
-                  (slot.i / WRECK_AREA_HORIZONTAL_DIVISIONS) *
-                    (WRECK_AREA_RIGHT - WRECK_AREA_LEFT),
-                y:
-                  WRECK_AREA_BOTTOM +
-                  (slot.j / WRECK_AREA_VERTICAL_DIVISIONS) *
-                    (WRECK_AREA_TOP - WRECK_AREA_BOTTOM),
-              };
+              const slotPosition = calculateSlotPosition(slot.i, slot.j);
               const distanceToTarget = distance(entity.position, slotPosition);
               if (distanceToTarget === 0) {
                 return entity.position;
@@ -558,7 +605,7 @@ const reducer = (state: State, action: Action): State => {
       const player = entityById(action.playerId, state.entities) as
         | Player
         | undefined;
-      if (!player || playerDistanceToGround(player, state.entities) > 0) {
+      if (!player || playerDistanceToNearestPlatform(player, state) > 0) {
         return state;
       }
       return {
