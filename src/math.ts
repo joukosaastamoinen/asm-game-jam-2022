@@ -6,7 +6,7 @@ export type Point = {
 export const vectorLength = (point: Point) =>
   Math.sqrt(point.x * point.x + point.y * point.y);
 
-export const vectorAbs = (point: Point) => {
+export const identityVector = (point: Point) => {
   const l = vectorLength(point);
   return { x: point.x / l, y: point.y / l };
 };

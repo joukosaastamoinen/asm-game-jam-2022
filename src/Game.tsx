@@ -11,7 +11,7 @@ import Player from "./Player";
 import reducer, { INITIAL_STATE } from "./reducer";
 import Water from "./Water";
 import { ENEMY_SPAWN_INTERVAL, PLAYER_ID } from "./constants";
-import { vectorAbs } from "./math";
+import { identityVector } from "./math";
 import Bullet from "./Bullet";
 import Enemy from "./Enemy";
 
@@ -78,7 +78,7 @@ const Game = () => {
       dispatch({
         type: "SHOOT",
         playerId: PLAYER_ID,
-        direction: vectorAbs({
+        direction: identityVector({
           x: clickCoordinates.x - player.position.x,
           y: clickCoordinates.y - player.position.y,
         }),
