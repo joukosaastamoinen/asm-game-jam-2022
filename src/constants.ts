@@ -1,6 +1,6 @@
 export const WATER_LEVEL = 0;
 export const GROUND_LEVEL = 10;
-export const GROUND_WIDTH = 700;
+export const GROUND_WIDTH = 616;
 export const PLAYER_WIDTH = 46;
 export const PLAYER_HEIGHT = 52;
 export const PLAYER_MOVEMENT_SPEED = 7 * 60;

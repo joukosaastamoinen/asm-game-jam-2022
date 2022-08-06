@@ -1,19 +1,13 @@
-import * as PIXI from "pixi.js";
-import { Graphics } from "@saitonakamura/react-pixi";
-import { useCallback } from "react";
-import { GROUND_LEVEL, GROUND_WIDTH } from "./constants";
+import { Sprite } from "@saitonakamura/react-pixi";
+import { GROUND_LEVEL } from "./constants";
+import island from "./island.png";
 
 const Ground = () => {
-  const draw = useCallback((g: PIXI.Graphics) => {
-    g.clear();
-    g.beginFill(0x773322, 1);
-    g.moveTo(-GROUND_WIDTH / 2, -GROUND_LEVEL);
-    g.lineTo(GROUND_WIDTH / 2, -GROUND_LEVEL);
-    g.lineTo(0.3 * GROUND_WIDTH, 1000);
-    g.lineTo(-0.3 * GROUND_WIDTH, 1000);
-    g.endFill();
-  }, []);
-  return <Graphics draw={draw} />;
+  return (
+    <>
+      <Sprite image={island} x={-340} y={-GROUND_LEVEL - 75} />
+    </>
+  );
 };
 
 export default Ground;
