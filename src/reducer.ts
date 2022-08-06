@@ -351,7 +351,7 @@ const tickPhysics = (state: State): State => {
               }
               const slotPosition = calculateSlotPosition(slot.i, slot.j);
               const distanceToTarget = distance(entity.position, slotPosition);
-              if (distanceToTarget === 0) {
+              if (distanceToTarget < 0.001) {
                 return entity.position;
               }
               const direction = identityVector(
