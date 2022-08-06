@@ -29,7 +29,6 @@ const atlasData = {
     player: [...Array(10)].map((_, index) => `player-${index}`),
   },
 };
-console.log(atlasData);
 
 // Hack around incorrect types in react-pixi
 const C = Container as any;
