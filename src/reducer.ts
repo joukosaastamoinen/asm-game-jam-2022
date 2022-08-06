@@ -19,6 +19,12 @@ import {
   PROJECTILE_RADIUS,
   ENEMY_PROJECTILE_DAMAGE,
   WRECK_FALL_DELAY,
+  WRECK_AREA_HORIZONTAL_DIVISIONS,
+  WRECK_AREA_VERTICAL_DIVISIONS,
+  WRECK_AREA_LEFT,
+  WRECK_AREA_RIGHT,
+  WRECK_AREA_TOP,
+  WRECK_AREA_BOTTOM,
 } from "./constants";
 import {
   distance,
@@ -67,6 +73,7 @@ type Entity = Player | Projectile | Enemy | Wreck;
 
 type State = {
   entities: Entity[];
+  slots: (string | null)[][];
 };
 
 type TickAction = {
@@ -114,6 +121,9 @@ export const INITIAL_STATE: State = {
       health: PLAYER_INITIAL_HEALTH,
     },
   ],
+  slots: [...Array(WRECK_AREA_HORIZONTAL_DIVISIONS)].map(() =>
+    Array(WRECK_AREA_VERTICAL_DIVISIONS).fill(null)
+  ),
 };
 
 const applyToEntityById = (
@@ -365,6 +375,54 @@ const applyDamage = (state: State): State => {
   }, state);
 };
 
+const isWreck = (entity: Entity): entity is Wreck => entity.type === "wreck";
+
+const findLastIndex = <T>(
+  predicateFn: (el: T) => boolean,
+  arr: T[]
+): number => {
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (predicateFn(arr[i])) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+const assignWrecksToSlots = (state: State): State => {
+  const wrecks: Wreck[] = state.entities
+    .filter(isWreck)
+    .filter((wreck) => wreck.lifetime === 0);
+  return {
+    ...state,
+    slots: wrecks.reduce((newSlots, wreck) => {
+      const column = Math.floor(
+        ((wreck.position.x - WRECK_AREA_LEFT) /
+          (WRECK_AREA_RIGHT - WRECK_AREA_LEFT)) *
+          WRECK_AREA_HORIZONTAL_DIVISIONS
+      );
+      const highestPossibleRow = Math.floor(
+        ((wreck.position.y - WRECK_AREA_BOTTOM) /
+          (WRECK_AREA_TOP - WRECK_AREA_BOTTOM)) *
+          WRECK_AREA_VERTICAL_DIVISIONS
+      );
+      const row = findLastIndex((el) => el === null, newSlots[column]);
+      if (row > -1 && row <= highestPossibleRow) {
+        return [
+          ...newSlots.slice(0, column),
+          [
+            ...newSlots[column].slice(0, row),
+            wreck.id,
+            ...newSlots[column].slice(row + 1),
+          ],
+          ...newSlots.slice(column + 1),
+        ];
+      }
+      return newSlots;
+    }, state.slots),
+  };
+};
+
 const commenceDeath = (state: State): State => {
   return {
     ...state,
@@ -452,7 +510,9 @@ const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "TICK": {
       return processEnemyShooting(
-        applyDamage(tickPhysics(cleanUp(commenceDeath(state))))
+        applyDamage(
+          tickPhysics(cleanUp(assignWrecksToSlots(commenceDeath(state))))
+        )
       );
     }
     case "MOVE": {
