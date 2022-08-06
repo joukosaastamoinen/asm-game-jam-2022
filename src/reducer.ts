@@ -251,7 +251,9 @@ const tickPhysics = (state: State): State => {
             },
             velocityY: Math.max(
               entity.velocityY - TIME_DELTA * GRAVITY,
-              distanceToGround <= 0 ? 0 : -Infinity
+              distanceToGround < 0 || Math.abs(distanceToGround) < 0.0001
+                ? 0
+                : -Infinity
             ),
           };
         }
@@ -628,7 +630,7 @@ const reducer = (state: State, action: Action): State => {
       const player = entityById(action.playerId, state.entities) as
         | Player
         | undefined;
-      if (!player || playerDistanceToNearestPlatform(player, state) > 0) {
+      if (!player || playerDistanceToNearestPlatform(player, state) > 0.0001) {
         return state;
       }
       return {
