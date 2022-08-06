@@ -115,21 +115,33 @@ const applyToEntityById = (
   );
 };
 
+const playerDistanceToGround = (
+  playerId: string,
+  entities: Entity[]
+): number => {
+  const player = entityById(playerId, entities) as Player;
+  const playerRightEdge = player.position.x + PLAYER_WIDTH / 2;
+  const playerLeftEdge = player.position.x - PLAYER_WIDTH / 2;
+  const playerBottomEdge = player.position.y - PLAYER_HEIGHT / 2;
+  const distanceToGround =
+    playerRightEdge >= -GROUND_WIDTH / 2 &&
+    playerLeftEdge < GROUND_WIDTH / 2 &&
+    playerBottomEdge >= GROUND_LEVEL
+      ? playerBottomEdge - GROUND_LEVEL
+      : Infinity;
+  return distanceToGround;
+};
+
 const tickPhysics = (state: State): State => {
   return {
     ...state,
     entities: state.entities.map((entity) => {
       switch (entity.type) {
         case "player": {
-          const playerRightEdge = entity.position.x + PLAYER_WIDTH / 2;
-          const playerLeftEdge = entity.position.x - PLAYER_WIDTH / 2;
-          const playerBottomEdge = entity.position.y - PLAYER_HEIGHT / 2;
-          const distanceToGround =
-            playerRightEdge >= -GROUND_WIDTH / 2 &&
-            playerLeftEdge < GROUND_WIDTH / 2 &&
-            playerBottomEdge >= GROUND_LEVEL
-              ? playerBottomEdge - GROUND_LEVEL
-              : Infinity;
+          const distanceToGround = playerDistanceToGround(
+            entity.id,
+            state.entities
+          );
           return {
             ...entity,
             position: {
@@ -342,6 +354,9 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case "JUMP": {
+      if (playerDistanceToGround(action.playerId, state.entities) > 0) {
+        return state;
+      }
       return {
         ...state,
         entities: applyToEntityById(
