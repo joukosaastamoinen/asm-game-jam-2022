@@ -117,11 +117,7 @@ const applyToEntityById = (
   );
 };
 
-const playerDistanceToGround = (
-  playerId: string,
-  entities: Entity[]
-): number => {
-  const player = entityById(playerId, entities) as Player;
+const playerDistanceToGround = (player: Player, entities: Entity[]): number => {
   const playerRightEdge = player.position.x + PLAYER_WIDTH / 2;
   const playerLeftEdge = player.position.x - PLAYER_WIDTH / 2;
   const playerBottomEdge = player.position.y - PLAYER_HEIGHT / 2;
@@ -141,7 +137,7 @@ const tickPhysics = (state: State): State => {
       switch (entity.type) {
         case "player": {
           const distanceToGround = playerDistanceToGround(
-            entity.id,
+            entity,
             state.entities
           );
           return {
@@ -433,7 +429,10 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case "JUMP": {
-      if (playerDistanceToGround(action.playerId, state.entities) > 0) {
+      const player = entityById(action.playerId, state.entities) as
+        | Player
+        | undefined;
+      if (!player || playerDistanceToGround(player, state.entities) > 0) {
         return state;
       }
       return {
@@ -446,11 +445,11 @@ const reducer = (state: State, action: Action): State => {
       };
     }
     case "SHOOT": {
-      const player = state.entities.find(
-        (entity) => entity.id === action.playerId
-      );
+      const player = entityById(action.playerId, state.entities) as
+        | Player
+        | undefined;
       if (!player) {
-        throw new Error(`Player with ID ${action.playerId} not found!`);
+        return state;
       }
       return {
         ...state,
