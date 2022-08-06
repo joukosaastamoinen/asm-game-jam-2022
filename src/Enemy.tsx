@@ -43,13 +43,9 @@ const Enemy = ({ position, damaged }: Props) => {
     (g: PIXI.Graphics) => {
       g.clear();
       g.beginFill(damaged ? 0x4444444 : 0x000000, 1);
-      // g.drawCircle(0, 0, ENEMY_RADIUS);
-      g.drawRect(
-        -ENEMY_RADIUS,
-        -ENEMY_RADIUS,
-        2 * ENEMY_RADIUS,
-        2 * ENEMY_RADIUS
-      );
+      g.drawCircle(0, 0, 0.9 * ENEMY_RADIUS);
+      g.drawRect(-ENEMY_RADIUS, -ENEMY_RADIUS, 5, 2 * ENEMY_RADIUS);
+      g.drawRect(ENEMY_RADIUS - 5, -ENEMY_RADIUS, 5, 2 * ENEMY_RADIUS);
       g.endFill();
     },
     [damaged]
