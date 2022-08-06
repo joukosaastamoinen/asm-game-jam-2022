@@ -12,4 +12,5 @@ export const ENEMY_RADIUS = 30;
 export const ENEMY_SPEED = 10;
 export const PLAYER_INITIAL_HEALTH = 100;
 export const ENEMY_INITIAL_HEALTH = 30;
+export const PLAYER_PROJECTILE_DAMAGE = 20;
 export const PLAYER_ID = "player";

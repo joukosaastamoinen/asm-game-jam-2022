@@ -21,3 +21,14 @@ export const vectorAdd = (a: Point, b: Point): Point => {
     y: a.y + b.y,
   };
 };
+
+export const vectorSub = (a: Point, b: Point): Point => {
+  return {
+    x: a.x - b.x,
+    y: a.y - b.y,
+  };
+};
+
+export const distance = (a: Point, b: Point): number => {
+  return vectorLength(vectorSub(a, b));
+};

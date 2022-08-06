@@ -12,8 +12,10 @@ import {
   PLAYER_INITIAL_HEALTH,
   PLAYER_MOVEMENT_SPEED,
   PLAYER_WIDTH,
+  ENEMY_RADIUS,
+  PLAYER_PROJECTILE_DAMAGE,
 } from "./constants";
-import { Point, vectorAdd, vectorMul } from "./math";
+import { distance, Point, vectorAdd, vectorMul } from "./math";
 
 type Player = {
   id: string;
@@ -162,10 +164,105 @@ const tickPhysics = (state: State): State => {
   };
 };
 
+type ProjectileCollision = {
+  projectileId: string;
+  targetId: string;
+};
+
+const isProjectileCollidingWithPlayer = (
+  projectile: Projectile,
+  player: Player
+): boolean => {
+  return false;
+};
+
+const isProjectileCollidingWithEnemy = (
+  projectile: Projectile,
+  enemy: Enemy
+): boolean => {
+  return distance(projectile.position, enemy.position) < ENEMY_RADIUS;
+};
+
+const isColliding = (
+  projectile: Projectile,
+  entity: Player | Enemy
+): boolean => {
+  return entity.type === "player"
+    ? isProjectileCollidingWithPlayer(projectile, entity)
+    : isProjectileCollidingWithEnemy(projectile, entity);
+};
+
+const findProjectileHits = (state: State): ProjectileCollision[] => {
+  return state.entities.reduce((acc, entity) => {
+    if (entity.type === "projectile") {
+      acc.push(
+        ...state.entities
+          .filter(
+            (otherEntity) =>
+              (otherEntity.type === "player" || otherEntity.type === "enemy") &&
+              isColliding(entity, otherEntity)
+          )
+          .map(
+            (otherEntity): ProjectileCollision => ({
+              projectileId: entity.id,
+              targetId: otherEntity.id,
+            })
+          )
+      );
+    }
+    return acc;
+  }, [] as ProjectileCollision[]);
+};
+
+const entityById = (
+  entityId: string,
+  entities: Entity[]
+): Entity | undefined => {
+  return entities.find((entity) => entity.id === entityId);
+};
+
+const removeEntityById = (
+  entityToRemoveId: string,
+  entities: Entity[]
+): Entity[] => {
+  return entities.filter((entity) => entity.id !== entityToRemoveId);
+};
+
+const applyDamage = (state: State): State => {
+  const projectileHits = findProjectileHits(state);
+  return projectileHits.reduce((acc, hit) => {
+    const target = entityById(hit.targetId, state.entities) as Player | Enemy;
+    const projectile = entityById(
+      hit.projectileId,
+      state.entities
+    ) as Projectile;
+    const projectileOwner = entityById(projectile.ownerId, state.entities) as
+      | Player
+      | Enemy;
+    if (target.type === "enemy" && projectileOwner.type === "player") {
+      return {
+        ...state,
+        entities: removeEntityById(
+          projectile.id,
+          applyToEntityById(
+            (enemy) => ({
+              ...enemy,
+              health: (enemy as Enemy).health - PLAYER_PROJECTILE_DAMAGE,
+            }),
+            target.id,
+            state.entities
+          )
+        ),
+      };
+    }
+    return acc;
+  }, state);
+};
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "TICK": {
-      return tickPhysics(state);
+      return applyDamage(tickPhysics(state));
     }
     case "MOVE": {
       return {
