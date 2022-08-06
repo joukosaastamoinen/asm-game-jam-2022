@@ -8,7 +8,11 @@ import jumpSound from "./jump1.mp3";
 import Ground from "./Ground";
 import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
-import reducer, { INITIAL_STATE } from "./reducer";
+import reducer, {
+  entityById,
+  INITIAL_STATE,
+  Player as PlayerT,
+} from "./reducer";
 import Water from "./Water";
 import {
   ENEMY_INITIAL_HEALTH,
@@ -18,6 +22,7 @@ import {
 import { identityVector } from "./math";
 import Projectile from "./Projectile";
 import Enemy from "./Enemy";
+import HealthMeter from "./HealthMeter";
 
 type Props = {
   canvasWidth: number;
@@ -112,31 +117,42 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
     };
   }, []);
 
+  const player = entityById(PLAYER_ID, state.entities);
+
   return (
-    <C position={[canvasWidth / 2, canvasHeight / 2 + 200]}>
-      <Water />
-      <Ground />
-      {/* eslint-disable-next-line array-callback-return */}
-      {state.entities.map((entity) => {
-        switch (entity.type) {
-          case "player": {
-            return <Player key={entity.id} position={entity.position} />;
+    <>
+      <HealthMeter
+        x={canvasWidth / 2 - 100}
+        y={20}
+        width={200}
+        height={6}
+        health={player ? (player as PlayerT).health : 0}
+      />
+      <C position={[canvasWidth / 2, canvasHeight / 2 + 200]}>
+        <Water />
+        <Ground />
+        {/* eslint-disable-next-line array-callback-return */}
+        {state.entities.map((entity) => {
+          switch (entity.type) {
+            case "player": {
+              return <Player key={entity.id} position={entity.position} />;
+            }
+            case "projectile": {
+              return <Projectile key={entity.id} position={entity.position} />;
+            }
+            case "enemy": {
+              return (
+                <Enemy
+                  key={entity.id}
+                  position={entity.position}
+                  damaged={entity.health < 0.7 * ENEMY_INITIAL_HEALTH}
+                />
+              );
+            }
           }
-          case "projectile": {
-            return <Projectile key={entity.id} position={entity.position} />;
-          }
-          case "enemy": {
-            return (
-              <Enemy
-                key={entity.id}
-                position={entity.position}
-                damaged={entity.health < 0.7 * ENEMY_INITIAL_HEALTH}
-              />
-            );
-          }
-        }
-      })}
-    </C>
+        })}
+      </C>
+    </>
   );
 };
 

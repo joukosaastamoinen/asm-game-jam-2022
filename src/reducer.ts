@@ -29,7 +29,7 @@ import {
   vectorSub,
 } from "./math";
 
-type Player = {
+export type Player = {
   id: string;
   type: "player";
   position: Point;
@@ -275,7 +275,7 @@ const findProjectileHits = (state: State): ProjectileCollision[] => {
   }, [] as ProjectileCollision[]);
 };
 
-const entityById = (
+export const entityById = (
   entityId: string,
   entities: Entity[]
 ): Entity | undefined => {
