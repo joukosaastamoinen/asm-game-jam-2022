@@ -74,7 +74,7 @@ type Wreck = {
 
 type Entity = Player | Projectile | Enemy | Wreck;
 
-type State = {
+export type State = {
   entities: Entity[];
   slots: (string | null)[][];
 };
@@ -104,7 +104,7 @@ type SpawnEnemyAction = {
   type: "SPAWN_ENEMY";
 };
 
-type Action =
+export type Action =
   | TickAction
   | MoveAction
   | JumpAction
