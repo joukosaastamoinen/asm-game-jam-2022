@@ -28,6 +28,7 @@ const Game = () => {
     const sound = new Howl({
       src: [music],
       loop: true,
+      volume: 0.5,
       autoplay: true,
     });
     return () => {
@@ -36,9 +37,9 @@ const Game = () => {
     };
   }, []);
 
-  const [playGunSound] = useSound(gunSound);
+  const [playGunSound] = useSound(gunSound, { volume: 0.5 });
 
-  const [playJumpSound] = useSound(jumpSound);
+  const [playJumpSound] = useSound(jumpSound, { volume: 0.5 });
 
   useTick(() => {
     dispatch({ type: "TICK" });
