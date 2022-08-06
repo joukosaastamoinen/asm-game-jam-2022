@@ -1,6 +1,7 @@
 import cuid from "cuid";
 import {
   BULLET_SPEED,
+  ENEMY_INITIAL_HEALTH,
   ENEMY_SPEED,
   GRAVITY,
   GROUND_LEVEL,
@@ -8,6 +9,7 @@ import {
   PLAYER_HEIGHT,
   PLAYER_ID,
   PLAYER_JUMP_SPEED,
+  PLAYER_INITIAL_HEALTH,
   PLAYER_MOVEMENT_SPEED,
   PLAYER_WIDTH,
 } from "./constants";
@@ -19,6 +21,7 @@ type Player = {
   position: Point;
   moveIntent: number;
   velocityY: number;
+  health: number;
 };
 
 type Projectile = {
@@ -26,12 +29,14 @@ type Projectile = {
   type: "projectile";
   position: Point;
   velocity: Point;
+  ownerId: string;
 };
 
 type Enemy = {
   id: string;
   type: "enemy";
   position: Point;
+  health: number;
 };
 
 type Entity = Player | Projectile | Enemy;
@@ -82,6 +87,7 @@ export const INITIAL_STATE: State = {
       position: { x: 0, y: GROUND_LEVEL + PLAYER_HEIGHT / 2 },
       moveIntent: 0,
       velocityY: 0,
+      health: PLAYER_INITIAL_HEALTH,
     },
   ],
 };
@@ -197,6 +203,7 @@ const reducer = (state: State, action: Action): State => {
             type: "projectile",
             position: player.position,
             velocity: vectorMul(BULLET_SPEED, action.direction),
+            ownerId: player.id,
           },
         ],
       };
@@ -213,6 +220,7 @@ const reducer = (state: State, action: Action): State => {
               x: Math.random() * 1000 - 500,
               y: 600,
             },
+            health: ENEMY_INITIAL_HEALTH,
           },
         ],
       };

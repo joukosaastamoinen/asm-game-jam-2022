@@ -10,4 +10,6 @@ export const BULLET_SPEED = 40;
 export const ENEMY_SPAWN_INTERVAL = 3;
 export const ENEMY_RADIUS = 30;
 export const ENEMY_SPEED = 10;
+export const PLAYER_INITIAL_HEALTH = 100;
+export const ENEMY_INITIAL_HEALTH = 30;
 export const PLAYER_ID = "player";
