@@ -6,14 +6,18 @@ type Props = {
   damaged: boolean;
 };
 
+const PIVOT = { x: 75, y: 75 };
+
+const SCALE = { x: 0.5, y: 0.5 };
+
 const Enemy = ({ position, damaged }: Props) => {
   return (
     <Sprite
       image={enemy}
       x={position.x}
       y={-position.y}
-      pivot={{ x: 75, y: 75 }}
-      scale={{ x: 0.5, y: 0.5 }}
+      pivot={PIVOT}
+      scale={SCALE}
     />
   );
 };
