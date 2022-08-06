@@ -64,7 +64,7 @@ type Enemy = {
   lifetime: number;
 };
 
-type Wreck = {
+export type Wreck = {
   id: string;
   type: "wreck";
   position: Point;
@@ -72,7 +72,7 @@ type Wreck = {
   lifetime: number; // in seconds
 };
 
-type Entity = Player | Projectile | Enemy | Wreck;
+export type Entity = Player | Projectile | Enemy | Wreck;
 
 export type State = {
   entities: Entity[];

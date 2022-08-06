@@ -1,5 +1,10 @@
 import { Howl } from "howler";
-import { Container, Sprite, useTick } from "@saitonakamura/react-pixi";
+import {
+  Container,
+  ParticleContainer,
+  Sprite,
+  useTick,
+} from "@saitonakamura/react-pixi";
 import { useEffect } from "react";
 import useSound from "use-sound";
 import music from "./music2.mp3";
@@ -9,7 +14,14 @@ import sky from "./sky.png";
 import Ground from "./Ground";
 import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
-import { Action, entityById, Player as PlayerT, State } from "./reducer";
+import {
+  Action,
+  Entity,
+  entityById,
+  Player as PlayerT,
+  State,
+  Wreck as WreckT,
+} from "./reducer";
 import water from "./water.png";
 import {
   ENEMY_INITIAL_HEALTH,
@@ -22,6 +34,7 @@ import Projectile from "./Projectile";
 import Enemy from "./Enemy";
 import HealthMeter from "./HealthMeter";
 import Wreck from "./Wreck";
+import EnemyExplosion from "./EnemyExplosion";
 
 type Props = {
   canvasWidth: number;
@@ -38,6 +51,10 @@ const JUMP_KEYS = ["Space", "KeyW"];
 
 // Hack around incorrect types in react-pixi
 const C = Container as any;
+
+const PC = ParticleContainer as any;
+
+const isWreck = (entity: Entity): entity is WreckT => entity.type === "wreck";
 
 const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
   useEffect(() => {
@@ -142,6 +159,13 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
           width={canvasWidth}
           height={(221 / 960) * canvasWidth}
         />
+        <PC position={[0, 0]}>
+          {state.entities.filter(isWreck).map((wreck) => {
+            return (
+              <Wreck key={wreck.id} x={wreck.position.x} y={wreck.position.y} />
+            );
+          })}
+        </PC>
         {state.entities.map((entity) => {
           switch (entity.type) {
             case "projectile": {
@@ -165,7 +189,7 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
             }
             case "wreck": {
               return (
-                <Wreck
+                <EnemyExplosion
                   key={entity.id}
                   x={entity.position.x}
                   y={entity.position.y}
