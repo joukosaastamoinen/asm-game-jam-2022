@@ -1,4 +1,4 @@
-import { Container, Graphics } from "@saitonakamura/react-pixi";
+import { Container, Graphics, useTick } from "@saitonakamura/react-pixi";
 import * as PIXI from "pixi.js";
 import { useCallback, useState } from "react";
 import { ENEMY_RADIUS } from "./constants";
@@ -11,8 +11,12 @@ type Props = {
 const C = Container as any;
 
 const Wreck = ({ position }: Props) => {
+  const [explosionScale, setExplosionScale] = useState(1);
   const [rotation] = useState(() => Math.PI * Math.random());
-  const draw = useCallback((g: PIXI.Graphics) => {
+  useTick((delta) => {
+    setExplosionScale((scale) => Math.max(0, scale - 0.2 * delta));
+  });
+  const drawWreck = useCallback((g: PIXI.Graphics) => {
     g.clear();
     g.lineStyle(2, 0x4444444, 1, 0);
     g.beginFill(0xbbbbbb, 1);
@@ -21,9 +25,18 @@ const Wreck = ({ position }: Props) => {
     g.drawRect(ENEMY_RADIUS - 5, -ENEMY_RADIUS, 5, 2 * ENEMY_RADIUS);
     g.endFill();
   }, []);
+  const drawExplosion = useCallback((g: PIXI.Graphics) => {
+    g.clear();
+    g.beginFill(0xffffff, 1);
+    g.drawCircle(0, 0, 70);
+    g.endFill();
+  }, []);
   return (
     <C x={position.x} y={-position.y} rotation={rotation}>
-      <Graphics draw={draw} />
+      <Graphics draw={drawWreck} />
+      <C scale={{ x: explosionScale, y: explosionScale }}>
+        <Graphics draw={drawExplosion} />
+      </C>
     </C>
   );
 };
