@@ -21,7 +21,7 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
   return (
     <>
       <Stage
-        options={{ backgroundColor: 0xffcc99 }}
+        options={{ backgroundColor: 0x000000 }}
         width={canvasWidth}
         height={canvasHeight}
       >

@@ -1,19 +1,21 @@
 import { Howl } from "howler";
-import { Container, useTick } from "@saitonakamura/react-pixi";
+import { Container, Sprite, useTick } from "@saitonakamura/react-pixi";
 import { useEffect } from "react";
 import useSound from "use-sound";
 import music from "./music1.mp3";
 import gunSound from "./pew1.mp3";
 import jumpSound from "./jump1.mp3";
+import sky from "./sky.png";
 import Ground from "./Ground";
 import useKeys from "./keyboard/useKeys";
 import Player from "./Player";
 import { Action, entityById, Player as PlayerT, State } from "./reducer";
-import Water from "./Water";
+import water from "./water.png";
 import {
   ENEMY_INITIAL_HEALTH,
   ENEMY_SPAWN_INTERVAL,
   PLAYER_ID,
+  WATER_LEVEL,
 } from "./constants";
 import { identityVector } from "./math";
 import Projectile from "./Projectile";
@@ -118,6 +120,13 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
 
   return (
     <>
+      <Sprite
+        image={sky}
+        x={0}
+        y={0}
+        width={canvasWidth}
+        height={canvasHeight}
+      />
       <HealthMeter
         x={canvasWidth / 2 - 100}
         y={20}
@@ -126,7 +135,13 @@ const Level = ({ canvasWidth, canvasHeight, state, dispatch }: Props) => {
         health={player ? (player as PlayerT).health : 0}
       />
       <C position={[canvasWidth / 2, canvasHeight / 2 + 200]}>
-        <Water />
+        <Sprite
+          image={water}
+          x={-canvasWidth / 2}
+          y={-WATER_LEVEL}
+          width={canvasWidth}
+          height={(221 / 960) * canvasWidth}
+        />
         {state.entities.map((entity) => {
           switch (entity.type) {
             case "projectile": {
