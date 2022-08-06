@@ -215,6 +215,9 @@ const distanceToNearestWall = (player: Player, state: State): number => {
   const column = Math.floor(
     ((player.position.x - GRID_LEFT) / (GRID_RIGHT - GRID_LEFT)) * GRID_COLUMNS
   );
+  if (column <= 0 || column >= GRID_COLUMNS - 1) {
+    return Infinity;
+  }
   const slotWidth = gridWidth / GRID_COLUMNS;
   if (player.moveIntent > 0) {
     for (let i = column + 1; i < GRID_COLUMNS; i++) {
@@ -223,6 +226,16 @@ const distanceToNearestWall = (player: Player, state: State): number => {
         const slotLeftEdge = slotPosition.x - slotWidth / 2;
         const playerRightEdge = player.position.x + PLAYER_WIDTH / 2;
         return slotLeftEdge - playerRightEdge;
+      }
+    }
+  }
+  if (player.moveIntent < 0) {
+    for (let i = column - 1; i >= 0; i--) {
+      if (state.slots[i][row] !== null) {
+        const slotPosition = calculateSlotPosition(i, row);
+        const slotRightEdge = slotPosition.x + slotWidth / 2;
+        const playerLeftEdge = player.position.x - PLAYER_WIDTH / 2;
+        return playerLeftEdge - slotRightEdge;
       }
     }
   }
@@ -257,9 +270,11 @@ const tickPhysics = (state: State): State => {
               x:
                 entity.position.x +
                 Math.min(
-                  TIME_DELTA * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
+                  TIME_DELTA * PLAYER_MOVEMENT_SPEED,
                   distanceToNearestWall(entity, state)
-                ),
+                ) *
+                  entity.moveIntent,
+
               y:
                 entity.position.y +
                 Math.max(
