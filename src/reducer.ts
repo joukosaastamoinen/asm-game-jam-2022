@@ -673,7 +673,7 @@ const reducer = (state: State, action: Action): State => {
       const player = entityById(action.playerId, state.entities) as
         | Player
         | undefined;
-      if (!player || playerDistanceToNearestPlatform(player, state) > 0.0001) {
+      if (!player || playerDistanceToNearestPlatform(player, state) > 50) {
         return state;
       }
       return {
