@@ -183,26 +183,27 @@ const playerDistanceToNearestPlatform = (
       (WRECK_AREA_RIGHT - WRECK_AREA_LEFT)) *
       WRECK_AREA_HORIZONTAL_DIVISIONS
   );
-  return distanceToGround;
-  // if (column < 0 || column >= WRECK_AREA_HORIZONTAL_DIVISIONS) {
-  //   return distanceToGround;
-  // }
-  // const row = findLastIndex(
-  //   (slot) => slot !== null,
-  //   state.slots[column].slice(
-  //     0,
-  //     Math.floor(
-  //       ((playerBottomEdge - WRECK_AREA_BOTTOM) /
-  //         (WRECK_AREA_TOP - WRECK_AREA_BOTTOM)) *
-  //         WRECK_AREA_VERTICAL_DIVISIONS
-  //     )
-  //   )
-  // );
-  // if (row === -1) {
-  //   return distanceToGround;
-  // }
-  // return calculateSlotPosition(column, row);
-  // return distanceToGround;
+  if (column < 0 || column >= WRECK_AREA_HORIZONTAL_DIVISIONS) {
+    return distanceToGround;
+  }
+  const wreckAreaHeight = WRECK_AREA_TOP - WRECK_AREA_BOTTOM;
+  const row = findLastIndex(
+    (slot) => slot !== null,
+    state.slots[column].slice(
+      0,
+      Math.floor(
+        ((playerBottomEdge - WRECK_AREA_BOTTOM) / wreckAreaHeight) *
+          WRECK_AREA_VERTICAL_DIVISIONS
+      )
+    )
+  );
+  if (row === -1) {
+    return distanceToGround;
+  }
+  const slotHeight = wreckAreaHeight / WRECK_AREA_VERTICAL_DIVISIONS;
+  const slotPosition = calculateSlotPosition(column, row);
+  const slotTopEdge = slotPosition.y + slotHeight / 2;
+  return playerBottomEdge - slotTopEdge;
 };
 
 const tickPhysics = (state: State): State => {
