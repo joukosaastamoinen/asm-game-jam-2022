@@ -240,18 +240,17 @@ const applyDamage = (state: State): State => {
       | Player
       | Enemy;
     if (target.type === "enemy" && projectileOwner.type === "player") {
+      const newEnemy = {
+        ...target,
+        health: target.health - PLAYER_PROJECTILE_DAMAGE,
+      };
       return {
         ...state,
         entities: removeEntityById(
           projectile.id,
-          applyToEntityById(
-            (enemy) => ({
-              ...enemy,
-              health: (enemy as Enemy).health - PLAYER_PROJECTILE_DAMAGE,
-            }),
-            target.id,
-            state.entities
-          )
+          newEnemy.health <= 0
+            ? removeEntityById(newEnemy.id, state.entities)
+            : applyToEntityById((enemy) => newEnemy, target.id, state.entities)
         ),
       };
     }
