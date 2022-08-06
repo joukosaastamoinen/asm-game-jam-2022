@@ -5,6 +5,7 @@ type Props = {
 };
 
 const Root = styled.div`
+  user-select: none;
   position: fixed;
   top: 50vh;
   left: 50vw;
