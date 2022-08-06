@@ -14,5 +14,5 @@ export const ENEMY_SPEED = 10;
 export const PLAYER_INITIAL_HEALTH = 100;
 export const ENEMY_INITIAL_HEALTH = 50;
 export const PLAYER_PROJECTILE_DAMAGE = 20;
-export const ENEMY_FIRING_INTERVAL = 1.2; // make enemies shoot every n seconds
+export const ENEMY_FIRING_INTERVAL = 2.2; // make enemies shoot every n seconds
 export const PLAYER_ID = "player";
