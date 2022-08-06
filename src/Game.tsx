@@ -118,7 +118,7 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
     };
   }, []);
 
-  const player = entityById(PLAYER_ID, state.entities);
+  const player = entityById(PLAYER_ID, state.entities) as PlayerT | undefined;
 
   return (
     <>
@@ -154,7 +154,13 @@ const Game = ({ canvasWidth, canvasHeight }: Props) => {
           }
         })}
         <Ground />
-        {player && <Player key={player.id} position={player.position} />}
+        {player && (
+          <Player
+            key={player.id}
+            position={player.position}
+            moveIntent={player.moveIntent}
+          />
+        )}
       </C>
     </>
   );
