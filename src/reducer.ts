@@ -212,31 +212,42 @@ const tickPhysics = (state: State): State => {
               lifetime: entity.lifetime + TIME_DELTA,
             };
           }
-          const slot = wreckIdToSlot.get(entity.id);
-          const direction = slot
-            ? identityVector(
-                vectorSub(
-                  {
-                    x:
-                      WRECK_AREA_LEFT +
-                      (slot.i / WRECK_AREA_HORIZONTAL_DIVISIONS) *
-                        (WRECK_AREA_RIGHT - WRECK_AREA_LEFT),
-                    y:
-                      WRECK_AREA_BOTTOM +
-                      (slot.j / WRECK_AREA_VERTICAL_DIVISIONS) *
-                        (WRECK_AREA_TOP - WRECK_AREA_BOTTOM),
-                  },
-                  entity.position
-                )
-              )
-            : { x: 0, y: -1 };
           return {
             ...entity,
             velocityY: entity.velocityY + TIME_DELTA * GRAVITY,
-            position: vectorAdd(
-              entity.position,
-              vectorMul(TIME_DELTA * entity.velocityY, direction)
-            ),
+            position: (function () {
+              const slot = wreckIdToSlot.get(entity.id);
+              if (!slot) {
+                return vectorAdd(
+                  entity.position,
+                  vectorMul(TIME_DELTA * entity.velocityY, { x: 0, y: -1 })
+                );
+              }
+              const slotPosition = {
+                x:
+                  WRECK_AREA_LEFT +
+                  (slot.i / WRECK_AREA_HORIZONTAL_DIVISIONS) *
+                    (WRECK_AREA_RIGHT - WRECK_AREA_LEFT),
+                y:
+                  WRECK_AREA_BOTTOM +
+                  (slot.j / WRECK_AREA_VERTICAL_DIVISIONS) *
+                    (WRECK_AREA_TOP - WRECK_AREA_BOTTOM),
+              };
+              const distanceToTarget = distance(entity.position, slotPosition);
+              if (distanceToTarget === 0) {
+                return entity.position;
+              }
+              const direction = identityVector(
+                vectorSub(slotPosition, entity.position)
+              );
+              return vectorAdd(
+                entity.position,
+                vectorMul(
+                  Math.min(TIME_DELTA * entity.velocityY, distanceToTarget),
+                  direction
+                )
+              );
+            })(),
             lifetime: entity.lifetime + TIME_DELTA,
           };
         }
