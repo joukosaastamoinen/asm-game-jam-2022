@@ -1,6 +1,6 @@
 import { Container, Graphics } from "@saitonakamura/react-pixi";
 import * as PIXI from "pixi.js";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ENEMY_RADIUS } from "./constants";
 import { identityVector, vectorSub } from "./math";
 
