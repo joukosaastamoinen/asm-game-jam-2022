@@ -1,7 +1,9 @@
 import { Container, Graphics, useTick } from "@saitonakamura/react-pixi";
 import * as PIXI from "pixi.js";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import useSound from "use-sound";
 import { ENEMY_RADIUS } from "./constants";
+import explosionSound from "./rajahdys.mp3";
 
 type Props = {
   position: { x: number; y: number };
@@ -11,6 +13,10 @@ type Props = {
 const C = Container as any;
 
 const Wreck = ({ position }: Props) => {
+  const [playExplosionSound] = useSound(explosionSound, { volume: 0.4 });
+  useEffect(() => {
+    playExplosionSound();
+  }, [playExplosionSound]);
   const [explosionScale, setExplosionScale] = useState(1);
   const [rotation] = useState(() => Math.PI * Math.random());
   useTick((delta) => {
