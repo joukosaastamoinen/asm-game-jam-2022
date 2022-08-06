@@ -142,14 +142,14 @@ const applyToEntityById = (
   );
 };
 
-const calculateSlotPosition = (i: number, j: number) => {
-  const wreckAreaWidth = GRID_RIGHT - GRID_LEFT;
-  const wreckAreaHeight = GRID_TOP - GRID_BOTTOM;
-  const slotWidth = wreckAreaWidth / GRID_COLUMNS;
-  const slotHeight = wreckAreaHeight / GRID_ROWS;
+const calculateSlotPosition = (column: number, row: number) => {
+  const gridWidth = GRID_RIGHT - GRID_LEFT;
+  const gridHeight = GRID_TOP - GRID_BOTTOM;
+  const slotWidth = gridWidth / GRID_COLUMNS;
+  const slotHeight = gridHeight / GRID_ROWS;
   return {
-    x: GRID_LEFT + (i / GRID_COLUMNS) * wreckAreaWidth + slotWidth / 2,
-    y: GRID_BOTTOM + (j / GRID_ROWS) * wreckAreaHeight + slotHeight / 2,
+    x: GRID_LEFT + (column / GRID_COLUMNS) * gridWidth + slotWidth / 2,
+    y: GRID_BOTTOM + (row / GRID_ROWS) * gridHeight + slotHeight / 2,
   };
 };
 
@@ -203,6 +203,32 @@ const playerDistanceToNearestPlatform = (
   return playerBottomEdge - slotTopEdge;
 };
 
+const distanceToNearestWall = (player: Player, state: State): number => {
+  const gridWidth = GRID_RIGHT - GRID_LEFT;
+  const gridHeight = GRID_TOP - GRID_BOTTOM;
+  const row = Math.floor(
+    ((player.position.y - GRID_BOTTOM) / gridHeight) * GRID_ROWS
+  );
+  if (row < 0 || row >= GRID_ROWS) {
+    return Infinity;
+  }
+  const column = Math.floor(
+    ((player.position.x - GRID_LEFT) / (GRID_RIGHT - GRID_LEFT)) * GRID_COLUMNS
+  );
+  const slotWidth = gridWidth / GRID_COLUMNS;
+  if (player.moveIntent > 0) {
+    for (let i = column + 1; i < GRID_COLUMNS; i++) {
+      if (state.slots[i][row] !== null) {
+        const slotPosition = calculateSlotPosition(i, row);
+        const slotLeftEdge = slotPosition.x - slotWidth / 2;
+        const playerRightEdge = player.position.x + PLAYER_WIDTH / 2;
+        return slotLeftEdge - playerRightEdge;
+      }
+    }
+  }
+  return Infinity;
+};
+
 const tickPhysics = (state: State): State => {
   const wreckIdToSlot = new Map<string, { i: number; j: number }>();
   for (let i = 0; i < state.slots.length; i++) {
@@ -230,7 +256,10 @@ const tickPhysics = (state: State): State => {
             position: {
               x:
                 entity.position.x +
-                TIME_DELTA * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
+                Math.min(
+                  TIME_DELTA * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
+                  distanceToNearestWall(entity, state)
+                ),
               y:
                 entity.position.y +
                 Math.max(
