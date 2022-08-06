@@ -96,66 +96,70 @@ const applyToEntityById = (
   );
 };
 
+const tickPhysics = (state: State): State => {
+  return {
+    ...state,
+    entities: state.entities.map((entity) => {
+      switch (entity.type) {
+        case "player": {
+          const playerRightEdge = entity.position.x + PLAYER_WIDTH / 2;
+          const playerLeftEdge = entity.position.x - PLAYER_WIDTH / 2;
+          const playerBottomEdge = entity.position.y - PLAYER_HEIGHT / 2;
+          const distanceToGround =
+            playerRightEdge >= -GROUND_WIDTH / 2 &&
+            playerLeftEdge < GROUND_WIDTH / 2 &&
+            playerBottomEdge >= GROUND_LEVEL
+              ? playerBottomEdge - GROUND_LEVEL
+              : Infinity;
+          return {
+            ...entity,
+            position: {
+              x:
+                entity.position.x +
+                TIME_DELTA * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
+              y:
+                entity.position.y +
+                Math.max(
+                  TIME_DELTA * entity.velocityY,
+                  -Math.max(0, distanceToGround)
+                ),
+            },
+            velocityY: Math.max(
+              entity.velocityY - TIME_DELTA * GRAVITY,
+              distanceToGround <= 0 ? 0 : -Infinity
+            ),
+          };
+        }
+        case "projectile": {
+          return {
+            ...entity,
+            position: vectorAdd(
+              entity.position,
+              vectorMul(TIME_DELTA * BULLET_SPEED, entity.velocity)
+            ),
+          };
+        }
+        case "enemy": {
+          return {
+            ...entity,
+            position: vectorAdd(entity.position, {
+              x: 0,
+              y: -TIME_DELTA * ENEMY_SPEED,
+            }),
+          };
+        }
+        default: {
+          return entity;
+        }
+      }
+    }),
+  };
+};
+
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "TICK": {
-      return {
-        ...state,
-        entities: state.entities.map((entity) => {
-          switch (entity.type) {
-            case "player": {
-              const playerRightEdge = entity.position.x + PLAYER_WIDTH / 2;
-              const playerLeftEdge = entity.position.x - PLAYER_WIDTH / 2;
-              const playerBottomEdge = entity.position.y - PLAYER_HEIGHT / 2;
-              const distanceToGround =
-                playerRightEdge >= -GROUND_WIDTH / 2 &&
-                playerLeftEdge < GROUND_WIDTH / 2 &&
-                playerBottomEdge >= GROUND_LEVEL
-                  ? playerBottomEdge - GROUND_LEVEL
-                  : Infinity;
-              return {
-                ...entity,
-                position: {
-                  x:
-                    entity.position.x +
-                    TIME_DELTA * PLAYER_MOVEMENT_SPEED * entity.moveIntent,
-                  y:
-                    entity.position.y +
-                    Math.max(
-                      TIME_DELTA * entity.velocityY,
-                      -Math.max(0, distanceToGround)
-                    ),
-                },
-                velocityY: Math.max(
-                  entity.velocityY - TIME_DELTA * GRAVITY,
-                  distanceToGround <= 0 ? 0 : -Infinity
-                ),
-              };
-            }
-            case "projectile": {
-              return {
-                ...entity,
-                position: vectorAdd(
-                  entity.position,
-                  vectorMul(TIME_DELTA * BULLET_SPEED, entity.velocity)
-                ),
-              };
-            }
-            case "enemy": {
-              return {
-                ...entity,
-                position: vectorAdd(entity.position, {
-                  x: 0,
-                  y: -TIME_DELTA * ENEMY_SPEED,
-                }),
-              };
-            }
-            default: {
-              return entity;
-            }
-          }
-        }),
-      };
+      return tickPhysics(state);
     }
     case "MOVE": {
       return {
